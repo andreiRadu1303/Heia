@@ -38,5 +38,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  // Exclude `/auth/*` from the matcher so the Supabase confirmation route
+  // handler at `/auth/confirm` is reached directly — without the i18n
+  // middleware redirecting it to `/<locale>/auth/confirm` (which has no
+  // matching page and 404s).
+  matcher: ['/((?!api|auth|_next|_vercel|.*\\..*).*)'],
 };
