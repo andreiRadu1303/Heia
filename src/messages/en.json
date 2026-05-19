@@ -1,0 +1,73 @@
+{
+  "Meta": {
+    "siteName": "ProjectMarket",
+    "tagline": "Coming soon. A marketplace built for Romania.",
+    "description": "A new place to discover, connect, and transact with people you can trust."
+  },
+  "Nav": {
+    "browse": "Browse",
+    "login": "Log in",
+    "signup": "Sign up",
+    "dashboard": "Dashboard",
+    "messages": "Messages"
+  },
+  "Landing": {
+    "eyebrow": "Coming soon to Romania",
+    "title": "Find good people, when you need them.",
+    "subtitle": "A calm, considered place to discover specialists near you, see how they work, and book without friction. Join the waitlist and you'll be the first to know when we launch.",
+    "waitlistLabel": "Your email address",
+    "waitlistPlaceholder": "you@example.com",
+    "waitlistCta": "Join the waitlist",
+    "waitlistSuccess": "Thanks — we'll let you know when we launch.",
+    "waitlistNote": "No spam. One notification at launch.",
+    "pillarsTitle": "What we're building",
+    "pillar1Title": "Discover",
+    "pillar1Body": "People and places you'd recommend onward.",
+    "pillar2Title": "Read the style",
+    "pillar2Body": "Portfolio, reviews, what makes them theirs — before you take the first step.",
+    "pillar3Title": "Book simply",
+    "pillar3Body": "One place for appointments. No threads scattered across four apps."
+  },
+  "Auth": {
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to continue.",
+    "loginSubmit": "Sign in",
+    "signupTitle": "Create an account",
+    "signupSubtitle": "Sign up in a few seconds.",
+    "signupSubmit": "Create account",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••••",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "stubNotice": "This page is a placeholder. Real authentication will be wired up in the next phase."
+  },
+  "Stub": {
+    "comingSoon": "Coming soon",
+    "placeholderBody": "This page is a placeholder. Real content will be added in the next phase.",
+    "browseTitle": "Browse listings",
+    "browseSubtitle": "Listings will appear here, filterable by category, location, and availability.",
+    "listingTitle": "Listing detail",
+    "listingSubtitle": "Individual listing pages will live here: seller, description, price, reviews, and the primary action (book or order).",
+    "profileTitle": "Profile",
+    "profileSubtitle": "A seller's public profile, portfolio, and trust tier badges will appear here.",
+    "dashboardTitle": "Dashboard",
+    "dashboardSubtitle": "Your listings, transactions, and account stats will appear here.",
+    "messagesTitle": "Messages",
+    "messagesSubtitle": "Conversations with sellers or clients will appear here."
+  },
+  "Footer": {
+    "phase": "Foundation phase",
+    "internal": "Internal document · not for publication",
+    "links": "Links",
+    "legal": "Legal",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "body": "The page you were looking for does not exist or has been moved.",
+    "backHome": "Back to home"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "Meta": {
+    "siteName": "ProjectMarket",
+    "tagline": "În curând. O piață digitală construită pentru România.",
+    "description": "Un loc nou unde poți descoperi, conecta și colabora cu oameni de încredere."
+  },
+  "Nav": {
+    "browse": "Explorează",
+    "login": "Autentificare",
+    "signup": "Cont nou",
+    "dashboard": "Panou",
+    "messages": "Mesaje"
+  },
+  "Landing": {
+    "eyebrow": "În curând în România",
+    "title": "Găsește oameni buni când ai nevoie.",
+    "subtitle": "Construim un loc calm și curat unde poți descoperi specialiști aproape de tine, le poți vedea stilul, și poți rezerva fără pași inutili. Înscrie-te ca să afli primul când lansăm.",
+    "waitlistLabel": "Adresa ta de email",
+    "waitlistPlaceholder": "tu@example.com",
+    "waitlistCta": "Înscrie-mă",
+    "waitlistSuccess": "Mulțumim — te vom anunța când lansăm.",
+    "waitlistNote": "Fără spam. O singură notificare la lansare.",
+    "pillarsTitle": "Ce vrem să construim",
+    "pillar1Title": "Descoperă",
+    "pillar1Body": "Oameni și locuri pe care le-ai recomanda mai departe.",
+    "pillar2Title": "Înțelege stilul",
+    "pillar2Body": "Vezi portofoliul, recenziile și ce-i diferențiază — înainte să faci primul pas.",
+    "pillar3Title": "Rezervă simplu",
+    "pillar3Body": "Un singur loc pentru programări, fără mesaje în patru locuri diferite."
+  },
+  "Auth": {
+    "loginTitle": "Bine ai revenit",
+    "loginSubtitle": "Autentifică-te pentru a continua.",
+    "loginSubmit": "Intră în cont",
+    "signupTitle": "Cont nou",
+    "signupSubtitle": "Înregistrează-te în câteva secunde.",
+    "signupSubmit": "Creează cont",
+    "emailLabel": "Email",
+    "emailPlaceholder": "tu@example.com",
+    "passwordLabel": "Parolă",
+    "passwordPlaceholder": "••••••••",
+    "noAccount": "Nu ai cont?",
+    "haveAccount": "Ai deja cont?",
+    "stubNotice": "Această pagină este un placeholder. Autentificarea reală va fi conectată în faza următoare."
+  },
+  "Stub": {
+    "comingSoon": "În curând",
+    "placeholderBody": "Această pagină este un placeholder. Conținutul va fi adăugat în faza următoare.",
+    "browseTitle": "Explorează anunțuri",
+    "browseSubtitle": "Aici vor apărea anunțurile, filtrate după categorie, locație și disponibilitate.",
+    "listingTitle": "Detalii anunț",
+    "listingSubtitle": "Aici vor apărea detaliile unui anunț individual: vânzător, descriere, preț, recenzii și acțiunea principală (rezervare sau comandă).",
+    "profileTitle": "Profil",
+    "profileSubtitle": "Aici vor apărea profilul public al unui vânzător, portofoliul lui, și nivelurile lui de încredere.",
+    "dashboardTitle": "Panou",
+    "dashboardSubtitle": "Aici vor apărea anunțurile, tranzacțiile și statisticile contului tău.",
+    "messagesTitle": "Mesaje",
+    "messagesSubtitle": "Aici vor apărea conversațiile cu vânzătorii sau clienții tăi."
+  },
+  "Footer": {
+    "phase": "Faza fundațională",
+    "internal": "Document intern · nu pentru publicare",
+    "links": "Linkuri",
+    "legal": "Legal",
+    "terms": "Termeni",
+    "privacy": "Confidențialitate"
+  },
+  "NotFound": {
+    "title": "Pagina nu a fost găsită",
+    "body": "Pagina pe care o cauți nu există sau a fost mutată.",
+    "backHome": "Înapoi la pagina principală"
+  }
+}

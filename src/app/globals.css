@@ -1,0 +1,437 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =================================================================
+ * DEFAULT PALETTE (root) — Warm Premium light
+ * .dark — Soft Black Luxury (research-aligned dark counterpart)
+ * Tailwind's `dark:` modifier toggles to .dark via next-themes.
+ * ================================================================= */
+
+@layer base {
+  :root {
+    --background: 36 33% 95%;
+    --foreground: 30 18% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 30 18% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 18% 10%;
+    --primary: 30 18% 10%;
+    --primary-foreground: 36 33% 97%;
+    --secondary: 38 28% 90%;
+    --secondary-foreground: 30 18% 10%;
+    --muted: 38 28% 90%;
+    --muted-foreground: 30 14% 37%;
+    --accent: 38 47% 60%;
+    --accent-foreground: 30 18% 10%;
+    --destructive: 5 49% 44%;
+    --destructive-foreground: 36 33% 97%;
+    --border: 40 28% 84%;
+    --input: 40 28% 84%;
+    --ring: 30 18% 10%;
+    --radius: 0.5rem;
+    --font-display: var(--font-fraunces);
+    --font-body: var(--font-inter);
+    --font-mono: var(--font-jetbrains);
+  }
+
+  .dark {
+    --background: 20 13% 9%;
+    --foreground: 40 47% 91%;
+    --card: 20 14% 13%;
+    --card-foreground: 40 47% 91%;
+    --popover: 20 14% 13%;
+    --popover-foreground: 40 47% 91%;
+    --primary: 40 47% 91%;
+    --primary-foreground: 20 13% 9%;
+    --secondary: 20 14% 17%;
+    --secondary-foreground: 40 47% 91%;
+    --muted: 20 14% 17%;
+    --muted-foreground: 38 16% 60%;
+    --accent: 36 56% 66%;
+    --accent-foreground: 20 13% 9%;
+    --destructive: 8 47% 59%;
+    --destructive-foreground: 40 47% 91%;
+    --border: 20 14% 21%;
+    --input: 20 14% 21%;
+    --ring: 36 56% 66%;
+  }
+}
+
+/* =================================================================
+ * 12 PALETTES — forced selectors, used in preview /play and on the
+ * existing variant routes. Each palette is one self-contained mode
+ * (light or dark) and provides every shadcn token.
+ * ================================================================= */
+
+/* --- LIGHT, WARM ---------------------------------------------- */
+
+[data-palette='warm-premium'] {
+  --background: 36 33% 95%;
+  --foreground: 30 18% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 30 18% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 30 18% 10%;
+  --primary: 30 18% 10%;
+  --primary-foreground: 36 33% 97%;
+  --secondary: 38 28% 90%;
+  --secondary-foreground: 30 18% 10%;
+  --muted: 38 28% 90%;
+  --muted-foreground: 30 14% 37%;
+  --accent: 38 47% 60%;
+  --accent-foreground: 30 18% 10%;
+  --destructive: 5 49% 44%;
+  --destructive-foreground: 36 33% 97%;
+  --border: 40 28% 84%;
+  --input: 40 28% 84%;
+  --ring: 30 18% 10%;
+}
+
+[data-palette='rose-atelier'] {
+  --background: 15 36% 96%;
+  --foreground: 357 32% 18%;
+  --card: 0 0% 100%;
+  --card-foreground: 357 32% 18%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 357 32% 18%;
+  --primary: 357 32% 18%;
+  --primary-foreground: 15 36% 96%;
+  --secondary: 14 27% 90%;
+  --secondary-foreground: 357 32% 18%;
+  --muted: 14 27% 90%;
+  --muted-foreground: 357 14% 42%;
+  --accent: 0 38% 63%;
+  --accent-foreground: 357 32% 18%;
+  --destructive: 0 60% 45%;
+  --destructive-foreground: 15 36% 96%;
+  --border: 15 28% 85%;
+  --input: 15 28% 85%;
+  --ring: 357 32% 18%;
+}
+
+[data-palette='terracotta-sun'] {
+  --background: 33 51% 94%;
+  --foreground: 18 53% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 18 53% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 18 53% 15%;
+  --primary: 18 53% 15%;
+  --primary-foreground: 33 51% 94%;
+  --secondary: 31 51% 84%;
+  --secondary-foreground: 18 53% 15%;
+  --muted: 31 51% 84%;
+  --muted-foreground: 18 24% 35%;
+  --accent: 17 49% 49%;
+  --accent-foreground: 33 51% 96%;
+  --destructive: 0 60% 45%;
+  --destructive-foreground: 33 51% 96%;
+  --border: 30 38% 80%;
+  --input: 30 38% 80%;
+  --ring: 18 53% 15%;
+}
+
+[data-palette='espresso-cream'] {
+  --background: 41 41% 92%;
+  --foreground: 19 33% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 19 33% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 19 33% 11%;
+  --primary: 19 33% 11%;
+  --primary-foreground: 41 41% 94%;
+  --secondary: 38 28% 83%;
+  --secondary-foreground: 19 33% 11%;
+  --muted: 38 28% 83%;
+  --muted-foreground: 25 18% 34%;
+  --accent: 23 49% 43%;
+  --accent-foreground: 41 41% 94%;
+  --destructive: 0 60% 45%;
+  --destructive-foreground: 41 41% 94%;
+  --border: 35 24% 78%;
+  --input: 35 24% 78%;
+  --ring: 19 33% 11%;
+}
+
+/* --- LIGHT, COOL ---------------------------------------------- */
+
+[data-palette='cool-neutral'] {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 4%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 4%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 4%;
+  --primary: 240 6% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 5% 96%;
+  --secondary-foreground: 240 6% 10%;
+  --muted: 240 5% 96%;
+  --muted-foreground: 240 4% 46%;
+  --accent: 240 5% 96%;
+  --accent-foreground: 240 6% 10%;
+  --destructive: 0 84% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 6% 90%;
+  --input: 240 6% 90%;
+  --ring: 240 6% 10%;
+}
+
+[data-palette='sage-studio'] {
+  --background: 60 27% 96%;
+  --foreground: 132 11% 13%;
+  --card: 0 0% 100%;
+  --card-foreground: 132 11% 13%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 132 11% 13%;
+  --primary: 132 11% 13%;
+  --primary-foreground: 60 27% 96%;
+  --secondary: 80 14% 88%;
+  --secondary-foreground: 132 11% 13%;
+  --muted: 80 14% 88%;
+  --muted-foreground: 100 9% 35%;
+  --accent: 90 13% 48%;
+  --accent-foreground: 60 27% 98%;
+  --destructive: 0 60% 45%;
+  --destructive-foreground: 60 27% 98%;
+  --border: 75 12% 82%;
+  --input: 75 12% 82%;
+  --ring: 132 11% 13%;
+}
+
+[data-palette='coastal-mist'] {
+  --background: 180 18% 95%;
+  --foreground: 192 21% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 192 21% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 192 21% 15%;
+  --primary: 192 21% 15%;
+  --primary-foreground: 180 18% 96%;
+  --secondary: 180 14% 88%;
+  --secondary-foreground: 192 21% 15%;
+  --muted: 180 14% 88%;
+  --muted-foreground: 192 12% 38%;
+  --accent: 181 20% 46%;
+  --accent-foreground: 180 18% 98%;
+  --destructive: 0 60% 45%;
+  --destructive-foreground: 180 18% 98%;
+  --border: 180 12% 82%;
+  --input: 180 12% 82%;
+  --ring: 192 21% 15%;
+}
+
+[data-palette='lavender-haze'] {
+  --background: 274 25% 96%;
+  --foreground: 268 26% 16%;
+  --card: 0 0% 100%;
+  --card-foreground: 268 26% 16%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 268 26% 16%;
+  --primary: 268 26% 16%;
+  --primary-foreground: 274 25% 97%;
+  --secondary: 264 35% 90%;
+  --secondary-foreground: 268 26% 16%;
+  --muted: 264 35% 90%;
+  --muted-foreground: 264 15% 40%;
+  --accent: 264 22% 62%;
+  --accent-foreground: 268 26% 16%;
+  --destructive: 0 60% 45%;
+  --destructive-foreground: 274 25% 97%;
+  --border: 264 25% 84%;
+  --input: 264 25% 84%;
+  --ring: 268 26% 16%;
+}
+
+/* --- DARK ----------------------------------------------------- */
+
+[data-palette='soft-black'] {
+  --background: 20 13% 9%;
+  --foreground: 40 47% 91%;
+  --card: 20 14% 13%;
+  --card-foreground: 40 47% 91%;
+  --popover: 20 14% 13%;
+  --popover-foreground: 40 47% 91%;
+  --primary: 40 47% 91%;
+  --primary-foreground: 20 13% 9%;
+  --secondary: 20 14% 17%;
+  --secondary-foreground: 40 47% 91%;
+  --muted: 20 14% 17%;
+  --muted-foreground: 38 16% 60%;
+  --accent: 36 56% 66%;
+  --accent-foreground: 20 13% 9%;
+  --destructive: 8 47% 59%;
+  --destructive-foreground: 40 47% 91%;
+  --border: 20 14% 21%;
+  --input: 20 14% 21%;
+  --ring: 36 56% 66%;
+}
+
+[data-palette='midnight-garden'] {
+  --background: 212 36% 9%;
+  --foreground: 45 39% 89%;
+  --card: 207 31% 13%;
+  --card-foreground: 45 39% 89%;
+  --popover: 207 31% 13%;
+  --popover-foreground: 45 39% 89%;
+  --primary: 45 39% 89%;
+  --primary-foreground: 212 36% 9%;
+  --secondary: 207 31% 15%;
+  --secondary-foreground: 45 39% 89%;
+  --muted: 207 31% 15%;
+  --muted-foreground: 45 14% 62%;
+  --accent: 39 47% 59%;
+  --accent-foreground: 212 36% 9%;
+  --destructive: 0 60% 55%;
+  --destructive-foreground: 45 39% 89%;
+  --border: 207 24% 20%;
+  --input: 207 24% 20%;
+  --ring: 39 47% 59%;
+}
+
+[data-palette='forest-whisper'] {
+  --background: 102 16% 12%;
+  --foreground: 60 24% 88%;
+  --card: 132 13% 16%;
+  --card-foreground: 60 24% 88%;
+  --popover: 132 13% 16%;
+  --popover-foreground: 60 24% 88%;
+  --primary: 60 24% 88%;
+  --primary-foreground: 102 16% 12%;
+  --secondary: 132 13% 18%;
+  --secondary-foreground: 60 24% 88%;
+  --muted: 132 13% 18%;
+  --muted-foreground: 75 13% 60%;
+  --accent: 105 13% 50%;
+  --accent-foreground: 60 24% 92%;
+  --destructive: 0 60% 55%;
+  --destructive-foreground: 60 24% 92%;
+  --border: 120 10% 22%;
+  --input: 120 10% 22%;
+  --ring: 105 13% 50%;
+}
+
+[data-palette='onyx-editorial'] {
+  --background: 0 0% 4%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 7%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 4%;
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 62%;
+  --accent: 230 81% 62%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 16%;
+  --input: 0 0% 16%;
+  --ring: 230 81% 62%;
+}
+
+/* =================================================================
+ * 6 STYLES — typography + treatment.
+ * Sets font CSS variables and adds rules for heading weight,
+ * case, italic, letter-spacing. Scoped to descendants of the
+ * element carrying the data-style attribute.
+ * ================================================================= */
+
+[data-style='editorial'] {
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
+  --radius: 0.5rem;
+}
+[data-style='editorial'] h1,
+[data-style='editorial'] h2,
+[data-style='editorial'] h3 {
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+[data-style='modern-geometric'] {
+  --font-display: var(--font-manrope);
+  --font-body: var(--font-manrope);
+  --radius: 0.5rem;
+}
+[data-style='modern-geometric'] h1,
+[data-style='modern-geometric'] h2 {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+[data-style='boutique-classic'] {
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-inter);
+  --radius: 0.25rem;
+}
+[data-style='boutique-classic'] h1,
+[data-style='boutique-classic'] h2 {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+[data-style='brutalist'] {
+  --font-display: var(--font-inter);
+  --font-body: var(--font-inter);
+  --radius: 0rem;
+}
+[data-style='brutalist'] h1,
+[data-style='brutalist'] h2 {
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+[data-style='brutalist'] [data-soften] {
+  border-radius: 0 !important;
+}
+[data-style='brutalist'] .border,
+[data-style='brutalist'] .border-b,
+[data-style='brutalist'] .border-t {
+  border-width: 1.5px;
+}
+
+[data-style='soft-organic'] {
+  --font-display: var(--font-dm-sans);
+  --font-body: var(--font-dm-sans);
+  --radius: 1rem;
+}
+[data-style='soft-organic'] h1,
+[data-style='soft-organic'] h2 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+[data-style='minimal-tech'] {
+  --font-display: var(--font-inter);
+  --font-body: var(--font-inter);
+  --radius: 0.375rem;
+}
+[data-style='minimal-tech'] h1,
+[data-style='minimal-tech'] h2 {
+  text-transform: lowercase;
+  font-weight: 300;
+  letter-spacing: -0.025em;
+}
+
+/* =================================================================
+ * Base styles
+ * ================================================================= */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+  ::selection {
+    background-color: hsl(var(--accent) / 0.4);
+  }
+}

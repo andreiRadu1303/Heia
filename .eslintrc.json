@@ -1,0 +1,16 @@
+{
+  "extends": "next/core-web-vitals",
+  "ignorePatterns": ["tools/", ".next/", "node_modules/"],
+  "overrides": [
+    {
+      "files": [
+        "src/components/preview-*/**/*.tsx",
+        "src/components/preview-pages/**/*.tsx",
+        "src/app/[locale]/preview/**/*.tsx"
+      ],
+      "rules": {
+        "@next/next/no-img-element": "off"
+      }
+    }
+  ]
+}
