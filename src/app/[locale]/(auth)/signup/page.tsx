@@ -1,12 +1,17 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+
 import { Link } from '@/i18n/navigation';
-
 import { PageShell } from '@/components/page-shell';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { SignupForm } from './signup-form';
 
-export default async function SignupPage() {
+export default async function SignupPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('Auth');
   return (
     <PageShell>
@@ -17,29 +22,13 @@ export default async function SignupPage() {
             <CardDescription>{t('signupSubtitle')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="rounded-md border border-dashed bg-muted/40 p-3 text-xs text-muted-foreground">
-              {t('stubNotice')}
-            </p>
-            <form className="space-y-3">
-              <div className="space-y-1.5">
-                <label htmlFor="email" className="text-sm font-medium">
-                  {t('emailLabel')}
-                </label>
-                <Input id="email" type="email" placeholder={t('emailPlaceholder')} autoComplete="email" />
-              </div>
-              <div className="space-y-1.5">
-                <label htmlFor="password" className="text-sm font-medium">
-                  {t('passwordLabel')}
-                </label>
-                <Input id="password" type="password" placeholder={t('passwordPlaceholder')} autoComplete="new-password" />
-              </div>
-              <Button type="button" className="w-full" disabled>
-                {t('signupSubmit')}
-              </Button>
-            </form>
+            <SignupForm locale={locale} />
             <p className="text-center text-sm text-muted-foreground">
               {t('haveAccount')}{' '}
-              <Link href="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+              <Link
+                href="/login"
+                className="font-medium text-foreground underline-offset-4 hover:underline"
+              >
                 {t('loginSubmit')}
               </Link>
             </p>
