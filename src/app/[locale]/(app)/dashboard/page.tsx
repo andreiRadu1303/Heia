@@ -134,8 +134,11 @@ export default async function ClientHome({
         {/* Categories carousel — 2 rows, horizontal scroll */}
         <section>
           <h2 className="mb-4 text-xl font-medium tracking-tight">Categories</h2>
-          <div className="-mr-4 overflow-x-auto">
-            <div className="grid w-max grid-flow-col grid-rows-2 gap-3 pb-1 pr-4 [grid-auto-columns:42%] sm:[grid-auto-columns:30%] lg:[grid-auto-columns:22%]">
+          <div className="overflow-x-auto pb-2">
+            <div
+              className="grid w-max grid-flow-col grid-rows-2 gap-3"
+              style={{ gridAutoColumns: '11rem' }}
+            >
               {CATEGORIES.map((c) => (
                 <CategoryBox key={c.id} category={c} />
               ))}
@@ -180,7 +183,7 @@ function CategoryBox({ category }: { category: Category }) {
   return (
     <Link
       href={`/discover?category=${category.id}`}
-      className="group relative aspect-[5/4] overflow-hidden rounded-3xl ring-1 ring-border"
+      className="group relative block h-32 overflow-hidden rounded-3xl ring-1 ring-border"
     >
       <img
         src={img.card(`cat-${category.id}`)}
