@@ -3,58 +3,60 @@
 @tailwind utilities;
 
 /* =================================================================
- * DEFAULT PALETTE (root) — Warm Premium light
- * .dark — Soft Black Luxury (research-aligned dark counterpart)
+ * DEFAULT PALETTE (root) — Sage Studio light + Soft Wellness type.
+ * .dark — Forest Whisper (the wellness dark counterpart).
+ * This is the committed look of the real app. Preview pages still
+ * override locally via [data-palette] / [data-style].
  * Tailwind's `dark:` modifier toggles to .dark via next-themes.
  * ================================================================= */
 
 @layer base {
   :root {
-    --background: 36 33% 95%;
-    --foreground: 30 18% 10%;
+    --background: 60 27% 96%;
+    --foreground: 132 11% 13%;
     --card: 0 0% 100%;
-    --card-foreground: 30 18% 10%;
+    --card-foreground: 132 11% 13%;
     --popover: 0 0% 100%;
-    --popover-foreground: 30 18% 10%;
-    --primary: 30 18% 10%;
-    --primary-foreground: 36 33% 97%;
-    --secondary: 38 28% 90%;
-    --secondary-foreground: 30 18% 10%;
-    --muted: 38 28% 90%;
-    --muted-foreground: 30 14% 37%;
-    --accent: 38 47% 60%;
-    --accent-foreground: 30 18% 10%;
-    --destructive: 5 49% 44%;
-    --destructive-foreground: 36 33% 97%;
-    --border: 40 28% 84%;
-    --input: 40 28% 84%;
-    --ring: 30 18% 10%;
-    --radius: 0.5rem;
-    --font-display: var(--font-fraunces);
-    --font-body: var(--font-inter);
+    --popover-foreground: 132 11% 13%;
+    --primary: 132 11% 13%;
+    --primary-foreground: 60 27% 96%;
+    --secondary: 80 14% 88%;
+    --secondary-foreground: 132 11% 13%;
+    --muted: 80 14% 88%;
+    --muted-foreground: 100 9% 35%;
+    --accent: 90 13% 48%;
+    --accent-foreground: 60 27% 98%;
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 60 27% 98%;
+    --border: 75 12% 82%;
+    --input: 75 12% 82%;
+    --ring: 132 11% 13%;
+    --radius: 1rem;
+    --font-display: var(--font-dm-sans);
+    --font-body: var(--font-dm-sans);
     --font-mono: var(--font-jetbrains);
   }
 
   .dark {
-    --background: 20 13% 9%;
-    --foreground: 40 47% 91%;
-    --card: 20 14% 13%;
-    --card-foreground: 40 47% 91%;
-    --popover: 20 14% 13%;
-    --popover-foreground: 40 47% 91%;
-    --primary: 40 47% 91%;
-    --primary-foreground: 20 13% 9%;
-    --secondary: 20 14% 17%;
-    --secondary-foreground: 40 47% 91%;
-    --muted: 20 14% 17%;
-    --muted-foreground: 38 16% 60%;
-    --accent: 36 56% 66%;
-    --accent-foreground: 20 13% 9%;
-    --destructive: 8 47% 59%;
-    --destructive-foreground: 40 47% 91%;
-    --border: 20 14% 21%;
-    --input: 20 14% 21%;
-    --ring: 36 56% 66%;
+    --background: 102 16% 12%;
+    --foreground: 60 24% 88%;
+    --card: 132 13% 16%;
+    --card-foreground: 60 24% 88%;
+    --popover: 132 13% 16%;
+    --popover-foreground: 60 24% 88%;
+    --primary: 60 24% 88%;
+    --primary-foreground: 102 16% 12%;
+    --secondary: 132 13% 18%;
+    --secondary-foreground: 60 24% 88%;
+    --muted: 132 13% 18%;
+    --muted-foreground: 75 13% 60%;
+    --accent: 105 13% 50%;
+    --accent-foreground: 60 24% 92%;
+    --destructive: 0 60% 55%;
+    --destructive-foreground: 60 24% 92%;
+    --border: 120 10% 22%;
+    --input: 120 10% 22%;
+    --ring: 105 13% 50%;
   }
 }
 

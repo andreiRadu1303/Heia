@@ -6,7 +6,8 @@
       "files": [
         "src/components/preview-*/**/*.tsx",
         "src/components/preview-pages/**/*.tsx",
-        "src/app/[locale]/preview/**/*.tsx"
+        "src/components/app/**/*.tsx",
+        "src/app/**/*.tsx"
       ],
       "rules": {
         "@next/next/no-img-element": "off"
