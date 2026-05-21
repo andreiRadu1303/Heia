@@ -422,3 +422,90 @@ export function studiosByCategory(categoryId: string): Studio[] {
 export function formatLei(value: number): string {
   return value === 0 ? 'Free' : `${value} lei`;
 }
+
+/* ================================================================
+ * Provider side — the logged-in provider's own studio + bookings.
+ * For the demo, the provider "owns" Andra Studio.
+ * ================================================================ */
+
+export const MY_STUDIO_ID = 'andra-studio';
+
+export type BookingStatus = 'pending' | 'confirmed' | 'completed';
+
+export interface IncomingBooking {
+  id: string;
+  clientName: string;
+  clientAvatarSeed: string;
+  serviceName: string;
+  date: string; // ISO date
+  time: string;
+  priceLei: number;
+  status: BookingStatus;
+}
+
+export const INCOMING_BOOKINGS: IncomingBooking[] = [
+  { id: 'b1', clientName: 'Ioana M.', clientAvatarSeed: 'cl-ioana', serviceName: 'Balayage + gloss', date: todayPlus(0), time: '11:00', priceLei: 520, status: 'confirmed' },
+  { id: 'b2', clientName: 'Andreea P.', clientAvatarSeed: 'cl-andreea', serviceName: 'Cut & finish', date: todayPlus(0), time: '14:30', priceLei: 180, status: 'confirmed' },
+  { id: 'b3', clientName: 'Raluca D.', clientAvatarSeed: 'cl-raluca', serviceName: 'Root touch-up', date: todayPlus(1), time: '10:00', priceLei: 260, status: 'pending' },
+  { id: 'b4', clientName: 'Maria T.', clientAvatarSeed: 'cl-maria', serviceName: 'Treatment & blow-dry', date: todayPlus(1), time: '16:00', priceLei: 140, status: 'pending' },
+  { id: 'b5', clientName: 'Carmen V.', clientAvatarSeed: 'cl-carmen', serviceName: 'Cut & finish', date: todayPlus(2), time: '12:00', priceLei: 180, status: 'confirmed' },
+];
+
+export const PROVIDER_STATS = {
+  upcoming: INCOMING_BOOKINGS.filter((b) => b.status !== 'completed').length,
+  weekEarningsLei: 2480,
+  rating: 4.9,
+  profileViews: 312,
+};
+
+export interface WeeklyHour {
+  day: string;
+  open: string;
+  close: string;
+  enabled: boolean;
+}
+
+export const WEEKLY_HOURS: WeeklyHour[] = [
+  { day: 'Monday', open: '09:00', close: '18:00', enabled: true },
+  { day: 'Tuesday', open: '09:00', close: '18:00', enabled: true },
+  { day: 'Wednesday', open: '09:00', close: '18:00', enabled: true },
+  { day: 'Thursday', open: '09:00', close: '20:00', enabled: true },
+  { day: 'Friday', open: '09:00', close: '20:00', enabled: true },
+  { day: 'Saturday', open: '10:00', close: '16:00', enabled: true },
+  { day: 'Sunday', open: '10:00', close: '16:00', enabled: false },
+];
+
+/* ================================================================
+ * Client side — the logged-in client's own bookings (dashboard).
+ * ================================================================ */
+
+export interface ClientBooking {
+  id: string;
+  studioId: string;
+  studioName: string;
+  serviceName: string;
+  date: string;
+  time: string;
+  status: BookingStatus;
+  heroSeed: string;
+}
+
+export const CLIENT_BOOKINGS: ClientBooking[] = [
+  { id: 'cb1', studioId: 'calm-rooms', studioName: 'Calm Rooms', serviceName: 'Deep tissue (60 min)', date: todayPlus(2), time: '18:00', status: 'confirmed', heroSeed: 'calm-hero' },
+  { id: 'cb2', studioId: 'nail-atelier', studioName: 'Nail Atelier', serviceName: 'Manicure + gel', date: todayPlus(6), time: '13:30', status: 'confirmed', heroSeed: 'nail-hero' },
+];
+
+function todayPlus(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+export function formatBookingDate(iso: string, locale: string): string {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString(locale, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  });
+}

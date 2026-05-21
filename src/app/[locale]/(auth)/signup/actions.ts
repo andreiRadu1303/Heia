@@ -18,6 +18,7 @@ export async function signupAction(
   const displayName = String(formData.get('display_name') ?? '').trim();
   const marketingConsent = formData.get('marketing_consent') === 'on';
   const locale = String(formData.get('locale') ?? 'ro');
+  const role = formData.get('role') === 'provider' ? 'provider' : 'client';
 
   if (!email || !password || !displayName) {
     return { error: 'errorGeneric' };
@@ -38,6 +39,7 @@ export async function signupAction(
         display_name: displayName,
         locale,
         marketing_consent: marketingConsent,
+        role,
       },
     },
   });

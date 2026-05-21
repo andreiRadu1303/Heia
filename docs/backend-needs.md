@@ -133,11 +133,32 @@ Everything stored as **integer minor units** (bani) + currency code, formatted a
 ### Images
 Mock uses Picsum/Pravatar via `<img>`. Real version: providers upload to Supabase Storage; serve via `next/image` with the storage domain in `remotePatterns`; generate transforms/thumbnails.
 
+## Account roles (built)
+
+Each account is **one role**, chosen at signup: `client` or `provider` (stored on `profiles.role`, migration `002_roles.sql`). The experience forks on this:
+
+| | Client | Provider |
+|---|---|---|
+| Home after login | `/dashboard` (upcoming bookings + account) | `/provider` (stats, today, manage) |
+| Main flow | services → discover → studio → book → checkout | manage profile / services / hours / incoming bookings |
+| Nav | site header | provider bottom-nav (`ProviderNav`) |
+| Guard | `/dashboard` redirects providers to `/provider` | `requireProvider()` gates the whole `/provider/*` group; clients bounce to `/dashboard` |
+
+**What still needs the DB for the provider side:**
+
+- The provider area currently reads a fixed mock studio (`MY_STUDIO_ID = 'andra-studio'`) and mock `INCOMING_BOOKINGS`. Real version: a provider's account links to **their** `providers` row via `providers.owner_id = profiles.id`. Each provider page queries by that.
+- `/provider/services` edits are local-only — needs `services` writes (insert/update/delete) scoped to the owner via RLS.
+- `/provider/availability` is local-only — needs the `provider_hours` table.
+- `/provider/bookings` Accept/Decline are non-functional — need `bookings.status` updates (pending → confirmed/cancelled) with an RLS policy letting the provider update bookings for their own studio, plus a notification to the client.
+- `/provider/profile` save is non-functional — needs an update on the owner's `providers` row.
+
+**Becoming a provider later:** out of scope (we chose one-role-at-signup). If we ever allow it, it's a role change on the profile + a provider-onboarding flow. Noted, not built.
+
 ## Suggested migration order
 
-1. `categories` + `providers` + `services` (seed with the current mock data) → wire landing, services, discover, studio profile to read from Supabase.
-2. `provider_hours` + `bookings` → wire the booking page to real availability + write a pending booking.
-3. Auth-gate the `(app)` group.
+1. `categories` + `providers` + `services` (seed with the current mock data) → wire landing, services, discover, studio profile to read from Supabase. Link `providers.owner_id` so a provider account resolves to its studio.
+2. `provider_hours` + `bookings` → wire the booking page to real availability + write a pending booking; wire `/provider/bookings` accept/decline.
+3. Auth-gate the client `(app)` loop (the provider area is already gated by `requireProvider`).
 4. `reviews` (tied to completed bookings).
-5. Stripe Connect + `payments` → replace the mock checkout.
+5. Stripe Connect + `payments` → replace the mock checkout + provider payouts.
 6. Geolocation + PostGIS "near me".

@@ -1,9 +1,12 @@
 'use client';
 
+import * as React from 'react';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useTranslations } from 'next-intl';
+import { CalendarHeart, Sparkles } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { signupAction, type SignupState } from './actions';
@@ -13,10 +16,33 @@ const initialState: SignupState = {};
 export function SignupForm({ locale }: { locale: string }) {
   const t = useTranslations('Auth');
   const [state, formAction] = useActionState(signupAction, initialState);
+  const [role, setRole] = React.useState<'client' | 'provider'>('client');
 
   return (
     <form action={formAction} className="space-y-4" noValidate>
       <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="role" value={role} />
+
+      {/* Role selector */}
+      <div className="space-y-1.5">
+        <span className="text-sm font-medium">{t('roleIntro')}</span>
+        <div className="grid grid-cols-2 gap-2">
+          <RoleCard
+            active={role === 'client'}
+            onClick={() => setRole('client')}
+            icon={<CalendarHeart className="size-5" />}
+            label={t('roleClient')}
+            hint={t('roleClientHint')}
+          />
+          <RoleCard
+            active={role === 'provider'}
+            onClick={() => setRole('provider')}
+            icon={<Sparkles className="size-5" />}
+            label={t('roleProvider')}
+            hint={t('roleProviderHint')}
+          />
+        </div>
+      </div>
 
       <div className="space-y-1.5">
         <label htmlFor="display_name" className="text-sm font-medium">
@@ -88,6 +114,43 @@ export function SignupForm({ locale }: { locale: string }) {
 
       <SubmitButton label={t('signupSubmit')} />
     </form>
+  );
+}
+
+function RoleCard({
+  active,
+  onClick,
+  icon,
+  label,
+  hint,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+  hint: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        'flex flex-col items-start gap-2 rounded-2xl border p-3 text-left transition-colors',
+        active ? 'border-foreground bg-secondary/60' : 'border-border bg-card hover:bg-secondary/30',
+      )}
+    >
+      <span
+        className={cn(
+          'grid size-9 place-items-center rounded-full',
+          active ? 'bg-foreground text-background' : 'bg-secondary text-foreground',
+        )}
+      >
+        {icon}
+      </span>
+      <span className="text-sm font-medium leading-tight">{label}</span>
+      <span className="text-xs text-muted-foreground">{hint}</span>
+    </button>
   );
 }
 

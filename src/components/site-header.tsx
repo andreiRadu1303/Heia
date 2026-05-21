@@ -4,6 +4,7 @@ import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { HeaderAuth } from '@/components/header-auth';
 
 export async function SiteHeader() {
   const tNav = await getTranslations('Nav');
@@ -37,15 +38,8 @@ export async function SiteHeader() {
             <ThemeToggle />
           </div>
 
-          {/* Auth buttons — now visible on mobile too */}
-          <div className="ml-1 flex items-center gap-1 sm:ml-2 sm:gap-2">
-            <Button variant="ghost" size="sm" asChild className="px-2.5 sm:px-3">
-              <Link href="/login">{tNav('login')}</Link>
-            </Button>
-            <Button size="sm" asChild className="px-2.5 sm:px-3">
-              <Link href="/signup">{tNav('signup')}</Link>
-            </Button>
-          </div>
+          {/* Auth buttons — login/signup or dashboard/sign-out (client island) */}
+          <HeaderAuth />
         </div>
       </div>
     </header>

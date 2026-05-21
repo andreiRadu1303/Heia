@@ -9,7 +9,8 @@
     "login": "Autentificare",
     "signup": "Cont nou",
     "dashboard": "Panou",
-    "messages": "Mesaje"
+    "messages": "Mesaje",
+    "signOut": "Deconectare"
   },
   "Landing": {
     "eyebrow": "În curând în România",
@@ -39,6 +40,11 @@
     "signupTitle": "Cont nou",
     "signupSubtitle": "Înregistrează-te în câteva secunde.",
     "signupSubmit": "Creează cont",
+    "roleIntro": "Vreau să…",
+    "roleClient": "Caut servicii",
+    "roleClientHint": "Descoperă și rezervă",
+    "roleProvider": "Ofer servicii",
+    "roleProviderHint": "Primesc clienți noi",
     "displayNameLabel": "Nume afișat",
     "displayNamePlaceholder": "Alexandra",
     "emailLabel": "Email",

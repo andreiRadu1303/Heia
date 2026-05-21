@@ -9,7 +9,8 @@
     "login": "Log in",
     "signup": "Sign up",
     "dashboard": "Dashboard",
-    "messages": "Messages"
+    "messages": "Messages",
+    "signOut": "Sign out"
   },
   "Landing": {
     "eyebrow": "Coming soon to Romania",
@@ -39,6 +40,11 @@
     "signupTitle": "Create an account",
     "signupSubtitle": "Sign up in a few seconds.",
     "signupSubmit": "Create account",
+    "roleIntro": "I want to…",
+    "roleClient": "Book services",
+    "roleClientHint": "Discover & book",
+    "roleProvider": "Offer services",
+    "roleProviderHint": "Get new clients",
     "displayNameLabel": "Display name",
     "displayNamePlaceholder": "Alexandra",
     "emailLabel": "Email",
