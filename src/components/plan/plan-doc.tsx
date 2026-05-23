@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import {
   META,
@@ -12,6 +13,9 @@ import {
   FEATURES,
   FEATURE_STATUSES,
   ROADMAP,
+  SCREENS,
+  DECISIONS,
+  KPIS,
   type SiteNode,
   type FeatureStatus,
   type PhaseStatus,
@@ -21,14 +25,18 @@ const TABS = [
   { id: 'concept', label: 'Concept' },
   { id: 'brand', label: 'Brand' },
   { id: 'structure', label: 'Structure' },
+  { id: 'screens', label: 'Screens' },
   { id: 'features', label: 'Features' },
   { id: 'roadmap', label: 'Roadmap' },
+  { id: 'decisions', label: 'Decisions' },
+  { id: 'kpis', label: 'KPIs' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
 
 export function PlanDoc() {
   const [tab, setTab] = React.useState<TabId>('concept');
+  const locale = useLocale();
 
   return (
     <div className="min-h-dvh">
@@ -73,8 +81,11 @@ export function PlanDoc() {
         {tab === 'concept' && <ConceptSection />}
         {tab === 'brand' && <BrandSection />}
         {tab === 'structure' && <StructureSection />}
+        {tab === 'screens' && <ScreensSection locale={locale} />}
         {tab === 'features' && <FeaturesSection />}
         {tab === 'roadmap' && <RoadmapSection />}
+        {tab === 'decisions' && <DecisionsSection />}
+        {tab === 'kpis' && <KpisSection />}
       </main>
 
       <footer className="border-t border-border py-8">
@@ -375,6 +386,127 @@ function RoadmapSection() {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/* ---------------- Screens ---------------- */
+
+function ScreensSection({ locale }: { locale: string }) {
+  const href = (path: string) => `/${locale}${path === '/' ? '' : path}`;
+  return (
+    <div>
+      <SectionTitle>Screens</SectionTitle>
+      <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
+        Live previews of the public screens at phone size. Auth-gated screens link out (they need a
+        session to render).
+      </p>
+      <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
+        {SCREENS.map((s) => (
+          <div key={s.label} className="flex flex-col gap-2">
+            <div className="flex items-baseline justify-between">
+              <div className="text-sm font-medium">{s.label}</div>
+              <a
+                href={href(s.path)}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground"
+              >
+                open →
+              </a>
+            </div>
+            <div className="text-xs text-muted-foreground">{s.note}</div>
+            {s.embeddable ? (
+              <div className="mt-1 overflow-hidden rounded-[28px] border-[8px] border-foreground/85 bg-foreground/85 shadow-xl">
+                <div className="overflow-hidden rounded-[20px] bg-background">
+                  <iframe
+                    src={href(s.path)}
+                    title={s.label}
+                    loading="lazy"
+                    width={360}
+                    height={620}
+                    style={{ width: '100%', height: 620, border: 0, display: 'block' }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <a
+                href={href(s.path)}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1 grid h-40 place-items-center rounded-3xl border border-dashed border-border bg-card text-center text-sm text-muted-foreground"
+              >
+                Requires login — open in a new tab
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Decisions ---------------- */
+
+function DecisionsSection() {
+  return (
+    <div>
+      <SectionTitle>Decisions log</SectionTitle>
+      <div className="space-y-3">
+        {DECISIONS.map((d) => (
+          <div key={d.title} className="rounded-3xl bg-card p-5 ring-1 ring-border">
+            <div className="flex items-baseline justify-between gap-3">
+              <h3 className="font-medium tracking-tight">{d.title}</h3>
+              <span className="shrink-0 font-mono text-[11px] text-muted-foreground">{d.date}</span>
+            </div>
+            <p className="mt-2 text-sm">{d.decision}</p>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground/70">Why: </span>
+              {d.why}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- KPIs ---------------- */
+
+function KpisSection() {
+  const areas = Array.from(new Set(KPIS.map((k) => k.area)));
+  return (
+    <div className="space-y-8">
+      <div>
+        <SectionTitle>KPIs / metrics</SectionTitle>
+        <p className="max-w-2xl text-sm text-muted-foreground">
+          What we&rsquo;ll watch, by stage. Targets are directional — many firm up once there&rsquo;s
+          real traffic.
+        </p>
+      </div>
+      {areas.map((area) => (
+        <div key={area}>
+          <div className="mb-3 text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            {area}
+          </div>
+          <div className="overflow-hidden rounded-3xl ring-1 ring-border">
+            {KPIS.filter((k) => k.area === area).map((k, i) => (
+              <div
+                key={k.metric}
+                className={cn(
+                  'flex items-baseline justify-between gap-4 bg-card px-5 py-3',
+                  i > 0 && 'border-t border-border',
+                )}
+              >
+                <span className="text-sm">{k.metric}</span>
+                <span className="shrink-0 text-right text-sm font-medium text-muted-foreground">
+                  {k.target}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

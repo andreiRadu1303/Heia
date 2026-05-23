@@ -212,3 +212,113 @@ export const ROADMAP: Phase[] = [
     items: ['More cities / international locales', 'Multi-currency', 'Mobile app', 'Loyalty + referrals'],
   },
 ];
+
+/* ---------------- Screens (live previews) ---------------- */
+
+export interface Screen {
+  label: string;
+  /** App path (locale is added automatically). */
+  path: string;
+  note: string;
+  /** Public pages embed as a live iframe; auth-gated ones link out. */
+  embeddable: boolean;
+}
+
+export const SCREENS: Screen[] = [
+  { label: 'Landing', path: '/', note: 'Marketing home', embeddable: true },
+  { label: 'Discover map', path: '/discover?category=hair', note: 'Map + draggable sheet', embeddable: true },
+  { label: 'Studio profile', path: '/studio/andra-studio', note: 'Provider page', embeddable: true },
+  { label: 'Design playground', path: '/preview/play', note: '12 palettes × 6 styles', embeddable: true },
+  { label: 'Client home', path: '/dashboard', note: 'Discovery — requires client login', embeddable: false },
+  { label: 'Provider dashboard', path: '/provider', note: 'Requires provider login', embeddable: false },
+];
+
+/* ---------------- Decisions log ---------------- */
+
+export interface Decision {
+  date: string;
+  title: string;
+  decision: string;
+  why: string;
+}
+
+export const DECISIONS: Decision[] = [
+  {
+    date: '2026-05',
+    title: 'Web stack: Next.js, not Flutter web',
+    decision: 'Server-rendered Next.js for the web app.',
+    why: 'Marketplace discovery lives or dies on SEO; the indexable surface is the product surface. Flutter web renders to canvas and is invisible to search.',
+  },
+  {
+    date: '2026-05',
+    title: 'Database: Supabase (Postgres + PostGIS)',
+    decision: 'Supabase over Firebase.',
+    why: 'Native geo for “near me”, relational data, full-text search, predictable cost, EU hosting for GDPR.',
+  },
+  {
+    date: '2026-05',
+    title: 'Launch market: Romania first',
+    decision: 'Romania-first, international-ready architecture.',
+    why: 'Underserved (no digitised aggregator), less competition, room to find product-market fit before scaling.',
+  },
+  {
+    date: '2026-05',
+    title: 'Concept: services / selfcare, not handmade goods',
+    decision: 'Locked the services marketplace over the goods candidate.',
+    why: 'Partner research targeted beauty/wellness; the services flow (book a person’s time) is the stronger wedge.',
+  },
+  {
+    date: '2026-05',
+    title: 'Positioning: wellness & authenticity (broader than beauty)',
+    decision: 'Frame as selfcare/wellness, all genders/ages.',
+    why: 'Authenticity over perfection integrates more services and avoids a narrow “beauty app” box.',
+  },
+  {
+    date: '2026-05',
+    title: 'Name: Heia',
+    decision: 'Working product name is Heia.',
+    why: 'Short, ownable, travels internationally. Trademark/clearance still to confirm before heavy spend.',
+  },
+  {
+    date: '2026-05',
+    title: 'Design: Soft Wellness + Sage',
+    decision: 'Committed the rounded, calm Soft Wellness style with the Sage palette as the app default.',
+    why: 'Best fit for the wellness/inclusive brief; the 12×6 playground stays for future exploration.',
+  },
+  {
+    date: '2026-05',
+    title: 'Accounts: one role at signup',
+    decision: 'Client or provider chosen at signup; not switchable for now.',
+    why: 'Simpler to build and reason about for v1; “become a provider later” is parked.',
+  },
+  {
+    date: '2026-05',
+    title: 'Build order: UI first, DB right after',
+    decision: 'Built the full loop on mock data, then wire Supabase.',
+    why: 'Lets us validate flow and design fast before committing schema.',
+  },
+];
+
+/* ---------------- KPIs / metrics ---------------- */
+
+export interface Kpi {
+  area: string;
+  metric: string;
+  target: string;
+}
+
+export const KPIS: Kpi[] = [
+  { area: 'Pre-launch', metric: 'Waitlist signups', target: 'Build a launch list' },
+  { area: 'Pre-launch', metric: 'Signup → email confirm rate', target: '> 70%' },
+  { area: 'Activation', metric: 'Signup → first booking (client)', target: 'To define' },
+  { area: 'Activation', metric: 'Provider onboarding completion', target: '> 60%' },
+  { area: 'Marketplace', metric: 'Bookings per week', target: 'Growth MoM' },
+  { area: 'Marketplace', metric: 'Active providers', target: 'To define' },
+  { area: 'Marketplace', metric: 'GMV (when payments live)', target: 'Growth MoM' },
+  { area: 'Retention', metric: 'Repeat booking rate (90d)', target: 'To define' },
+  { area: 'Retention', metric: 'Monthly active clients', target: 'Growth MoM' },
+  { area: 'Quality', metric: 'Average rating', target: '> 4.6' },
+  { area: 'Quality', metric: 'Review rate (per completed booking)', target: '> 30%' },
+  { area: 'Acquisition', metric: 'Organic vs paid mix', target: 'Favor organic / SEO' },
+  { area: 'Acquisition', metric: 'TikTok / IG → signup conversion', target: 'To define' },
+];
