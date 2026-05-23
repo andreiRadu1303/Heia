@@ -1,12 +1,21 @@
 /**
  * Master plan content for /plan.
  *
- * This is the single source of truth for the interactive plan document.
- * To change the plan, edit the data here — the page re-renders it.
- * Add a feature → push to FEATURES. Add a phase → push to ROADMAP. Etc.
+ * This file is the SEED / default for the interactive plan document.
+ * The page can be edited in the browser (changes persist to localStorage on
+ * this device, and can be exported/imported as JSON). When there are no local
+ * edits, the page renders these defaults — so updating the plan in code still
+ * works, and `DEFAULT_PLAN` below is what an in-browser "Reset" restores.
  */
 
-export const META = {
+export interface Meta {
+  product: string;
+  subtitle: string;
+  updated: string;
+  oneLiner: string;
+}
+
+export const META: Meta = {
   product: 'Heia',
   subtitle: 'Master plan',
   updated: '2026-05-16',
@@ -15,7 +24,19 @@ export const META = {
 
 /* ---------------- Concept ---------------- */
 
-export const CONCEPT = {
+export interface Audience {
+  who: string;
+  desc: string;
+}
+
+export interface Concept {
+  headline: string;
+  paragraphs: string[];
+  audience: Audience[];
+  differentiators: string[];
+}
+
+export const CONCEPT: Concept = {
   headline: 'Find your people for whatever selfcare means to you.',
   paragraphs: [
     'Heia is a two-sided marketplace that connects people looking after themselves with the specialists who help them do it — hair, tattoo, massage, nails, makeup, brows, skin, and more.',
@@ -36,7 +57,21 @@ export const CONCEPT = {
 
 /* ---------------- Brand ---------------- */
 
-export const BRAND = {
+export interface PaletteColor {
+  name: string;
+  hex: string;
+  role: string;
+}
+
+export interface Brand {
+  voice: string[];
+  hooks: string[];
+  palette: PaletteColor[];
+  type: { family: string; note: string };
+  style: string;
+}
+
+export const BRAND: Brand = {
   voice: [
     'Authentic, not aspirational-fake. Real people with a point of view.',
     'Calm and confident — present before it’s noticed.',
@@ -67,7 +102,13 @@ export const BRAND = {
 
 /* ---------------- Structure ---------------- */
 
-export const ROLES = [
+export interface RoleFlow {
+  role: string;
+  home: string;
+  journey: string[];
+}
+
+export const ROLES: RoleFlow[] = [
   {
     role: 'Client',
     home: '/dashboard',
@@ -117,7 +158,12 @@ export const SITEMAP: SiteNode[] = [
   { path: '/plan', label: 'This document', tag: 'shared' },
 ];
 
-export const STACK = [
+export interface StackItem {
+  name: string;
+  role: string;
+}
+
+export const STACK: StackItem[] = [
   { name: 'Next.js 15 (App Router)', role: 'Web framework, SSR for SEO' },
   { name: 'TypeScript + Tailwind + shadcn/ui', role: 'UI layer' },
   { name: 'next-intl', role: 'i18n — Romanian default + English' },
@@ -322,3 +368,34 @@ export const KPIS: Kpi[] = [
   { area: 'Acquisition', metric: 'Organic vs paid mix', target: 'Favor organic / SEO' },
   { area: 'Acquisition', metric: 'TikTok / IG → signup conversion', target: 'To define' },
 ];
+
+/* ---------------- Bundle (single object the editor reads/writes) ---------------- */
+
+export interface PlanData {
+  meta: Meta;
+  concept: Concept;
+  brand: Brand;
+  roles: RoleFlow[];
+  sitemap: SiteNode[];
+  stack: StackItem[];
+  features: Feature[];
+  roadmap: Phase[];
+  screens: Screen[];
+  decisions: Decision[];
+  kpis: Kpi[];
+}
+
+/** The built-in defaults. The /plan editor seeds from this and "Reset" restores it. */
+export const DEFAULT_PLAN: PlanData = {
+  meta: META,
+  concept: CONCEPT,
+  brand: BRAND,
+  roles: ROLES,
+  sitemap: SITEMAP,
+  stack: STACK,
+  features: FEATURES,
+  roadmap: ROADMAP,
+  screens: SCREENS,
+  decisions: DECISIONS,
+  kpis: KPIS,
+};
