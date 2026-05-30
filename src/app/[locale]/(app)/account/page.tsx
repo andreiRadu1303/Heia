@@ -1,24 +1,39 @@
 import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
-import { Star } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { Link } from '@/i18n/navigation';
 import { AppTopBar } from '@/components/app/app-top-bar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CLIENT_BOOKINGS, img, formatBookingDate } from '@/lib/app-mock-data';
+import { img, formatBookingDate } from '@/lib/app-mock-data';
+import { cn } from '@/lib/utils';
 import { logoutAction } from '../dashboard/actions';
 
 export const dynamic = 'force-dynamic';
 
+interface BookingWithStudio {
+  id: string;
+  scheduled_at: string;
+  status: 'pending' | 'confirmed' | 'declined' | 'cancelled' | 'completed';
+  service_name: string;
+  studios: {
+    slug: string;
+    name: string;
+    hero_seed: string | null;
+  } | null;
+}
+
 export default async function AccountPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ booked?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const sp = await searchParams;
 
   const supabase = await createClient();
   const {
@@ -32,15 +47,31 @@ export default async function AccountPage({
     .eq('id', user.id)
     .maybeSingle();
 
+  // RLS already restricts to bookings.client_id = auth.uid().
+  const { data: bookingsRaw } = await supabase
+    .from('bookings')
+    .select('id, scheduled_at, status, service_name, studios(slug, name, hero_seed)')
+    .order('scheduled_at', { ascending: true });
+
+  const bookings = (bookingsRaw ?? []) as unknown as BookingWithStudio[];
+  const justBooked = sp.booked === '1';
+
   return (
     <div className="min-h-dvh pb-12">
       <AppTopBar title="Account" backHref="/dashboard" />
 
       <main className="container space-y-8 pt-6">
+        {justBooked ? (
+          <div className="rounded-3xl bg-accent/15 p-4 text-sm ring-1 ring-accent/30">
+            <b>Booking sent.</b> The provider will confirm or decline shortly — you’ll see the
+            status update here.
+          </div>
+        ) : null}
+
         {/* Bookings */}
         <section>
           <h2 className="mb-4 text-xl font-medium tracking-tight">Your bookings</h2>
-          {CLIENT_BOOKINGS.length === 0 ? (
+          {bookings.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-start gap-3 py-8">
                 <p className="text-muted-foreground">No bookings yet.</p>
@@ -51,29 +82,43 @@ export default async function AccountPage({
             </Card>
           ) : (
             <div className="space-y-3">
-              {CLIENT_BOOKINGS.map((b) => (
-                <Link
-                  key={b.id}
-                  href={`/studio/${b.studioId}`}
-                  className="flex items-center gap-3 rounded-3xl bg-card p-3 ring-1 ring-border"
-                >
-                  <img
-                    src={img.square(b.heroSeed)}
-                    alt=""
-                    className="size-16 shrink-0 rounded-2xl object-cover"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium">{b.studioName}</div>
-                    <div className="truncate text-sm text-muted-foreground">{b.serviceName}</div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
-                      {formatBookingDate(b.date, locale)} · {b.time}
+              {bookings.map((b) => {
+                const studio = b.studios;
+                const datePart = b.scheduled_at.slice(0, 10);
+                const timePart = b.scheduled_at.slice(11, 16);
+                return (
+                  <Link
+                    key={b.id}
+                    href={studio ? `/studio/${studio.slug}` : '/dashboard'}
+                    className="flex items-center gap-3 rounded-3xl bg-card p-3 ring-1 ring-border"
+                  >
+                    <img
+                      src={img.square(studio?.hero_seed ?? 'heia-default')}
+                      alt=""
+                      className="size-16 shrink-0 rounded-2xl object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-medium">{studio?.name ?? 'Studio'}</div>
+                      <div className="truncate text-sm text-muted-foreground">{b.service_name}</div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        {formatBookingDate(datePart, locale)} · {timePart}
+                      </div>
                     </div>
-                  </div>
-                  <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-medium capitalize text-foreground">
-                    {b.status}
-                  </span>
-                </Link>
-              ))}
+                    <span
+                      className={cn(
+                        'shrink-0 rounded-full px-3 py-1 text-xs font-medium capitalize',
+                        b.status === 'pending' && 'bg-accent/15 text-foreground',
+                        b.status === 'confirmed' && 'bg-secondary text-secondary-foreground',
+                        b.status === 'declined' && 'bg-muted text-muted-foreground',
+                        b.status === 'cancelled' && 'bg-muted text-muted-foreground',
+                        b.status === 'completed' && 'bg-foreground text-background',
+                      )}
+                    >
+                      {b.status}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </section>
@@ -88,7 +133,10 @@ export default async function AccountPage({
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <Row label="Name" value={profile?.display_name ?? '—'} />
-              <Row label="Account type" value={profile?.role === 'provider' ? 'Provider' : 'Client'} />
+              <Row
+                label="Account type"
+                value={profile?.role === 'provider' ? 'Provider' : 'Client'}
+              />
               <Row
                 label="Marketing updates"
                 value={profile?.marketing_consent ? 'Subscribed' : 'Off'}

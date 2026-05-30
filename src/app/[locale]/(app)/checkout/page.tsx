@@ -1,8 +1,10 @@
 import { setRequestLocale } from 'next-intl/server';
 
 import { AppTopBar } from '@/components/app/app-top-bar';
-import { studioById } from '@/lib/app-mock-data';
+import { createClient } from '@/lib/supabase/server';
 import { CheckoutClient } from './checkout-client';
+
+export const dynamic = 'force-dynamic';
 
 export default async function CheckoutPage({
   params,
@@ -15,21 +17,37 @@ export default async function CheckoutPage({
   setRequestLocale(locale);
 
   const sp = await searchParams;
-  const studio = studioById(sp.studio ?? '');
-  const service = studio?.services.find((s) => s.id === sp.service);
+  const studioSlug = sp.studio ?? '';
+  const serviceId = sp.service ?? '';
+
+  const supabase = await createClient();
+
+  // Single query that validates the service belongs to a published studio with this slug.
+  const { data: bundle } = await supabase
+    .from('services')
+    .select('id, name, duration_min, price_lei, studios!inner(slug, name, is_published)')
+    .eq('id', serviceId)
+    .eq('studios.slug', studioSlug)
+    .eq('studios.is_published', true)
+    .maybeSingle();
+
+  const studio = bundle?.studios as
+    | { slug: string; name: string; is_published: boolean }
+    | undefined;
 
   return (
     <div className="min-h-dvh pb-12">
       <AppTopBar
         title="Checkout"
-        backHref={studio ? `/studio/${studio.id}/book` : '/services'}
+        backHref={studio ? `/studio/${studio.slug}/book` : '/services'}
       />
       <CheckoutClient
         studioName={studio?.name ?? ''}
-        studioId={studio?.id ?? ''}
-        serviceName={service?.name ?? ''}
-        priceLei={service?.priceLei ?? 0}
-        durationMin={service?.durationMin ?? 0}
+        studioSlug={studio?.slug ?? ''}
+        serviceId={(bundle?.id as string | undefined) ?? ''}
+        serviceName={(bundle?.name as string | undefined) ?? ''}
+        priceLei={(bundle?.price_lei as number | undefined) ?? 0}
+        durationMin={(bundle?.duration_min as number | undefined) ?? 0}
         date={sp.date ?? ''}
         time={sp.time ?? ''}
         locale={locale}

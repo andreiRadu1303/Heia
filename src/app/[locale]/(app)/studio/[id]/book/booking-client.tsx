@@ -6,9 +6,16 @@ import { Check, Clock } from 'lucide-react';
 import { useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { formatLei, type Studio } from '@/lib/app-mock-data';
+import { formatLei } from '@/lib/app-mock-data';
 
 const TIMES = ['09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '18:00'];
+
+export interface BookingService {
+  id: string;
+  name: string;
+  durationMin: number;
+  priceLei: number;
+}
 
 function nextDays(n: number): Date[] {
   const today = new Date();
@@ -19,26 +26,48 @@ function nextDays(n: number): Date[] {
   });
 }
 
-export function BookingClient({ studio, locale }: { studio: Studio; locale: string }) {
+export function BookingClient({
+  studioSlug,
+  studioName,
+  services,
+  locale,
+}: {
+  studioSlug: string;
+  studioName: string;
+  services: BookingService[];
+  locale: string;
+}) {
   const router = useRouter();
   const days = React.useMemo(() => nextDays(7), []);
-  const [serviceId, setServiceId] = React.useState(studio.services[0]?.id ?? '');
+  const [serviceId, setServiceId] = React.useState(services[0]?.id ?? '');
   const [dateIdx, setDateIdx] = React.useState(0);
   const [time, setTime] = React.useState<string | null>(null);
 
-  const service = studio.services.find((s) => s.id === serviceId);
+  const service = services.find((s) => s.id === serviceId);
   const canContinue = Boolean(service) && time != null;
 
   function handleContinue() {
     if (!canContinue || !service) return;
     const date = days[dateIdx].toISOString().slice(0, 10);
     const qs = new URLSearchParams({
-      studio: studio.id,
+      studio: studioSlug,
       service: service.id,
       date,
       time: time!,
     });
     router.push(`/checkout?${qs.toString()}`);
+  }
+
+  if (services.length === 0) {
+    return (
+      <main className="container pt-10">
+        <div className="rounded-3xl bg-card p-6 text-center ring-1 ring-border">
+          <p className="text-muted-foreground">
+            {studioName} hasn’t added any bookable services yet.
+          </p>
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -47,7 +76,7 @@ export function BookingClient({ studio, locale }: { studio: Studio; locale: stri
       <section>
         <h2 className="mb-3 text-lg font-medium tracking-tight">Choose a service</h2>
         <div className="space-y-2">
-          {studio.services.map((sv) => {
+          {services.map((sv) => {
             const selected = sv.id === serviceId;
             return (
               <button
