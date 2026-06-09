@@ -9,10 +9,92 @@
  * we keep whole-lei integers and format with `lei`.
  */
 
+/**
+ * Curated Unsplash photo IDs per seed.
+ *
+ * Every studio's `heroSeed` / `gallerySeeds` resolves to a specific image that
+ * matches the studio's category (a hair salon shows a hair salon, a tattoo
+ * studio shows tattoo work, etc.). All IDs HTTP-200 verified at write time.
+ *
+ * Any seed not in this table falls back to Picsum so adding new studios still
+ * works without breaking — just keeps the placeholder vibe of the early days.
+ */
+const UNSPLASH_BY_SEED: Record<string, string> = {
+  // ── Andra Studio (hair, balayage & lived-in colour) ──
+  'andra-hero': 'photo-1560066984-138dadb4c035',
+  'andra-1': 'photo-1605497788044-5a32c7078486',
+  'andra-2': 'photo-1492106087820-71f1a00d2b11',
+  'andra-3': 'photo-1522337094846-8a818192de1f',
+  'andra-4': 'photo-1595476108010-b4d1f102b1b1',
+  // ── Salon Lumina (hair, neighbourhood) ──
+  'lumina-hero': 'photo-1562322140-8baeececf3df',
+  'lumina-1': 'photo-1487412947147-5cebf100ffc2',
+  'lumina-2': 'photo-1457972729786-0411a3b2b626',
+  'lumina-3': 'photo-1605497788044-5a32c7078486',
+  // ── Mihai · Hair (editorial cuts & texture) ──
+  'mihai-hero': 'photo-1457972729786-0411a3b2b626',
+  'mihai-1': 'photo-1487412947147-5cebf100ffc2',
+  'mihai-2': 'photo-1595476108010-b4d1f102b1b1',
+  'mihai-3': 'photo-1492106087820-71f1a00d2b11',
+  // ── Bărbierie Veche (barber, hot towel, fades) ──
+  'barber-hero': 'photo-1503951914875-452162b0f3f1',
+  'barber-1': 'photo-1599351431202-1e0f0137899a',
+  'barber-2': 'photo-1585747860715-2ba37e788b70',
+  'barber-3': 'photo-1583001931096-959e9a1a6223',
+  // ── Ink & Co. (tattoo, fine-line & blackwork) ──
+  'ink-hero': 'photo-1565058379802-bbe93b2f703a',
+  'ink-1': 'photo-1542856391-010fb87dcfed',
+  'ink-2': 'photo-1576091160550-2173dba999ef',
+  'ink-3': 'photo-1583394838336-acd977736f90',
+  'ink-4': 'photo-1607734834519-d8576ae60ea6',
+  // ── Fine Line Atelier (tattoo, micro & minimal) ──
+  'fla-hero': 'photo-1611501275019-9b5cda994e8d',
+  'fla-1': 'photo-1542856391-010fb87dcfed',
+  'fla-2': 'photo-1576091160550-2173dba999ef',
+  'fla-3': 'photo-1607734834519-d8576ae60ea6',
+  // ── Calm Rooms (massage, deep tissue & relaxation) ──
+  'calm-hero': 'photo-1540555700478-4be289fbecef',
+  'calm-1': 'photo-1544161515-4ab6ce6db874',
+  'calm-2': 'photo-1591343395082-e120087004b4',
+  'calm-3': 'photo-1571019613454-1cb2f99b2d8b',
+  // ── Serene Touch (massage, aromatherapy & lymphatic) ──
+  'serene-hero': 'photo-1519823551278-64ac92734fb1',
+  'serene-1': 'photo-1580618864180-f6d7d39b8ff6',
+  'serene-2': 'photo-1605980776566-0486c3ac7617',
+  // ── Nail Atelier (nails, clean mani, quiet luxury) ──
+  'nail-hero': 'photo-1604654894610-df63bc536371',
+  'nail-1': 'photo-1632345031435-8727f6897d53',
+  'nail-2': 'photo-1607779097040-26e80aa78e66',
+  'nail-3': 'photo-1604902396830-aca29e19b067',
+  // ── Maria · MUA (makeup, soft glam & bridal) ──
+  'mua-hero': 'photo-1503236823255-94609f598e71',
+  'mua-1': 'photo-1531123897727-8f129e1688ce',
+  'mua-2': 'photo-1571781926291-c477ebfd024b',
+  'mua-3': 'photo-1556228720-195a672e8a03',
+  // ── The Brow Bar (brows & lashes) ──
+  'brow-hero': 'photo-1616394584738-fc6e612e71b9',
+  'brow-1': 'photo-1559599101-f09722fb4948',
+  'brow-2': 'photo-1568585105565-e372998a195d',
+  // ── Glow Skin Studio (facials & skin) ──
+  'glow-hero': 'photo-1570172619644-dfd03ed5d881',
+  'glow-1': 'photo-1583241475880-083f84372725',
+  'glow-2': 'photo-1591343395082-e120087004b4',
+  'glow-3': 'photo-1544161515-4ab6ce6db874',
+};
+
+function unsplash(seed: string, w: number, h: number): string | null {
+  const id = UNSPLASH_BY_SEED[seed];
+  if (!id) return null;
+  return `https://images.unsplash.com/${id}?w=${w}&h=${h}&fit=crop&auto=format&q=80`;
+}
+
 export const img = {
-  hero: (seed: string) => `https://picsum.photos/seed/heia-${seed}/900/1100`,
-  card: (seed: string) => `https://picsum.photos/seed/heia-${seed}/600/450`,
-  square: (seed: string) => `https://picsum.photos/seed/heia-${seed}/600/600`,
+  hero: (seed: string) =>
+    unsplash(seed, 900, 1100) ?? `https://picsum.photos/seed/heia-${seed}/900/1100`,
+  card: (seed: string) =>
+    unsplash(seed, 600, 450) ?? `https://picsum.photos/seed/heia-${seed}/600/450`,
+  square: (seed: string) =>
+    unsplash(seed, 600, 600) ?? `https://picsum.photos/seed/heia-${seed}/600/600`,
   avatar: (seed: string) => `https://i.pravatar.cc/240?u=heia-${seed}`,
 };
 
