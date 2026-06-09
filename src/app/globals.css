@@ -3,60 +3,69 @@
 @tailwind utilities;
 
 /* =================================================================
- * DEFAULT PALETTE (root) — Sage Studio light + Soft Wellness type.
- * .dark — Forest Whisper (the wellness dark counterpart).
- * This is the committed look of the real app. Preview pages still
- * override locally via [data-palette] / [data-style].
- * Tailwind's `dark:` modifier toggles to .dark via next-themes.
+ * DEFAULT PALETTE (root) — Heia Editorial.
+ *   Deepest Charcoal · Matte Black · Burnt Terracotta · Warm Gold · Deep Crimson
+ * Dark-by-default. The brand IS dark; .dark mirrors :root so next-themes
+ * can't put us back into a stale Sage. The previous Sage Studio palette
+ * is still selectable via [data-palette='sage-studio'] in /preview/play.
  * ================================================================= */
 
 @layer base {
   :root {
-    --background: 60 27% 96%;
-    --foreground: 132 11% 13%;
-    --card: 0 0% 100%;
-    --card-foreground: 132 11% 13%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 132 11% 13%;
-    --primary: 132 11% 13%;
-    --primary-foreground: 60 27% 96%;
-    --secondary: 80 14% 88%;
-    --secondary-foreground: 132 11% 13%;
-    --muted: 80 14% 88%;
-    --muted-foreground: 100 9% 35%;
-    --accent: 90 13% 48%;
-    --accent-foreground: 60 27% 98%;
-    --destructive: 0 60% 45%;
-    --destructive-foreground: 60 27% 98%;
-    --border: 75 12% 82%;
-    --input: 75 12% 82%;
-    --ring: 132 11% 13%;
+    /* Deepest Charcoal page bg, warm cream text */
+    --background: 30 14% 9%;
+    --foreground: 38 32% 92%;
+    /* Slightly-lifted matte card surface */
+    --card: 30 13% 12%;
+    --card-foreground: 38 32% 92%;
+    --popover: 30 13% 12%;
+    --popover-foreground: 38 32% 92%;
+    /* Primary action = Burnt Terracotta (CTAs, links, brand mark accents) */
+    --primary: 16 53% 48%;
+    --primary-foreground: 38 32% 96%;
+    /* Subtle warm darkness for chips/inputs */
+    --secondary: 30 12% 16%;
+    --secondary-foreground: 38 32% 92%;
+    --muted: 30 12% 16%;
+    --muted-foreground: 38 18% 60%;
+    /* Accent = Warm Gold (highlights, focused states, soft callouts) */
+    --accent: 38 47% 60%;
+    --accent-foreground: 30 14% 9%;
+    /* Destructive = Deep Crimson */
+    --destructive: 0 58% 32%;
+    --destructive-foreground: 38 32% 96%;
+    --border: 30 11% 19%;
+    --input: 30 11% 19%;
+    --ring: 16 53% 52%;
     --radius: 1rem;
     --font-display: var(--font-dm-sans);
     --font-body: var(--font-dm-sans);
     --font-mono: var(--font-jetbrains);
+    color-scheme: dark;
   }
 
+  /* next-themes toggles `.dark` on the html element; keep it identical
+     so a stale preference can't downgrade us to a different look. */
   .dark {
-    --background: 102 16% 12%;
-    --foreground: 60 24% 88%;
-    --card: 132 13% 16%;
-    --card-foreground: 60 24% 88%;
-    --popover: 132 13% 16%;
-    --popover-foreground: 60 24% 88%;
-    --primary: 60 24% 88%;
-    --primary-foreground: 102 16% 12%;
-    --secondary: 132 13% 18%;
-    --secondary-foreground: 60 24% 88%;
-    --muted: 132 13% 18%;
-    --muted-foreground: 75 13% 60%;
-    --accent: 105 13% 50%;
-    --accent-foreground: 60 24% 92%;
-    --destructive: 0 60% 55%;
-    --destructive-foreground: 60 24% 92%;
-    --border: 120 10% 22%;
-    --input: 120 10% 22%;
-    --ring: 105 13% 50%;
+    --background: 30 14% 9%;
+    --foreground: 38 32% 92%;
+    --card: 30 13% 12%;
+    --card-foreground: 38 32% 92%;
+    --popover: 30 13% 12%;
+    --popover-foreground: 38 32% 92%;
+    --primary: 16 53% 48%;
+    --primary-foreground: 38 32% 96%;
+    --secondary: 30 12% 16%;
+    --secondary-foreground: 38 32% 92%;
+    --muted: 30 12% 16%;
+    --muted-foreground: 38 18% 60%;
+    --accent: 38 47% 60%;
+    --accent-foreground: 30 14% 9%;
+    --destructive: 0 58% 32%;
+    --destructive-foreground: 38 32% 96%;
+    --border: 30 11% 19%;
+    --input: 30 11% 19%;
+    --ring: 16 53% 52%;
   }
 }
 
@@ -312,6 +321,30 @@
   --border: 120 10% 22%;
   --input: 120 10% 22%;
   --ring: 105 13% 50%;
+}
+
+[data-palette='heia-editorial'] {
+  /* The committed Heia palette. Same values as :root, exposed here so
+     /preview/play can show it as one of the named palette options. */
+  --background: 30 14% 9%;
+  --foreground: 38 32% 92%;
+  --card: 30 13% 12%;
+  --card-foreground: 38 32% 92%;
+  --popover: 30 13% 12%;
+  --popover-foreground: 38 32% 92%;
+  --primary: 16 53% 48%;
+  --primary-foreground: 38 32% 96%;
+  --secondary: 30 12% 16%;
+  --secondary-foreground: 38 32% 92%;
+  --muted: 30 12% 16%;
+  --muted-foreground: 38 18% 60%;
+  --accent: 38 47% 60%;
+  --accent-foreground: 30 14% 9%;
+  --destructive: 0 58% 32%;
+  --destructive-foreground: 38 32% 96%;
+  --border: 30 11% 19%;
+  --input: 30 11% 19%;
+  --ring: 16 53% 52%;
 }
 
 [data-palette='onyx-editorial'] {

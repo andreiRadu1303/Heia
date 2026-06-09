@@ -77,27 +77,31 @@ export const BRAND: Brand = {
     'Calm and confident — present before it’s noticed.',
     'Inclusive without erasing difference. All genders, all ages.',
     'European register: refinement + freedom, never sterile.',
+    'Editorial, not retail — closer to a perfumery campaign than a salon flyer.',
   ],
   hooks: [
     'Style should feel alive.',
     'Confidence is personal.',
     'Wellbeing doesn’t look the same on everyone.',
     'Find good people, when you need them.',
+    'All self-care services. Beard, skin, hair, grooming.',
   ],
-  // The committed direction. The /preview/play playground holds the wider exploration.
+  // Heia Editorial — dark-by-default, copper-accented. Replaces Soft Wellness + Sage.
+  // The earlier Sage palette is still selectable in /preview/play.
   palette: [
-    { name: 'Background', hex: '#F7F7F1', role: 'Bone / page' },
-    { name: 'Foreground', hex: '#1E2620', role: 'Deep slate text' },
-    { name: 'Accent', hex: '#7A8B6A', role: 'Sage' },
-    { name: 'Muted', hex: '#E3E5DA', role: 'Soft fills' },
-    { name: 'Dark bg', hex: '#1A2218', role: 'Forest (dark mode)' },
-    { name: 'Dark accent', hex: '#7A9170', role: 'Moss' },
+    { name: 'Deepest Charcoal', hex: '#1A1714', role: 'Page background' },
+    { name: 'Matte Black', hex: '#0E0C0A', role: 'Deepest surfaces' },
+    { name: 'Burnt Terracotta', hex: '#BC5C39', role: 'Primary action / brand mark' },
+    { name: 'Warm Gold', hex: '#C9A86A', role: 'Accent / highlights / kickers' },
+    { name: 'Deep Crimson', hex: '#6E1A1A', role: 'Velvet depth / destructive' },
+    { name: 'Cream', hex: '#EFE5D2', role: 'Foreground text' },
   ],
   type: {
     family: 'DM Sans',
-    note: 'Soft Wellness — rounded, friendly, gender-neutral. Larger radii, soft shadows, curved dividers.',
+    note: 'Sans-serif body, wide-tracked uppercase kickers, slight tracking on the brand mark. Editorial restraint over playful curves.',
   },
-  style: 'Soft Wellness + Sage (chosen 2026-05-16). 6 styles × 12 palettes remain explorable at /preview/play.',
+  style:
+    'Heia Editorial (chosen 2026-05-30). Dark-by-default, full-bleed photography, copper-and-gold accents, deep crimson for moments of drama. Replaces Soft Wellness + Sage as the committed look. 6 styles × 12 palettes remain explorable at /preview/play.',
 };
 
 /* ---------------- Structure ---------------- */

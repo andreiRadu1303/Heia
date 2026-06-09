@@ -18,150 +18,284 @@ export default async function LandingPage({
   const featured = STUDIOS.slice(0, 4);
 
   return (
-    <div className="relative flex min-h-dvh flex-col overflow-hidden">
-      {/* Soft blobs */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="absolute -left-24 -top-24 size-80 rounded-full opacity-40 blur-3xl" style={{ background: 'hsl(var(--accent))' }} />
-        <div className="absolute -right-20 top-72 size-72 rounded-full opacity-30 blur-3xl" style={{ background: 'hsl(var(--accent))' }} />
-      </div>
+    <div className="relative flex min-h-dvh flex-col overflow-hidden bg-background text-foreground">
+      <SiteHeader />
 
-      <div className="relative">
-        <SiteHeader />
+      <main>
+        {/* =====================================================
+            HERO — full-bleed editorial portrait + brand mark
+            ===================================================== */}
+        <section className="relative h-[88dvh] min-h-[640px] w-full overflow-hidden">
+          {/* Photo */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `
+                linear-gradient(to bottom, hsl(var(--background) / 0.05) 0%, hsl(var(--background) / 0.35) 55%, hsl(var(--background)) 100%),
+                url('/brand/heia-hero.jpg'),
+                linear-gradient(135deg, hsl(30 14% 14%) 0%, hsl(0 35% 18%) 100%)
+              `,
+            }}
+            aria-hidden
+          />
 
-        <main>
-          {/* Hero */}
-          <section className="container flex flex-col items-start gap-6 py-14 sm:items-center sm:py-24 sm:text-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-1.5 text-xs font-medium shadow-sm ring-1 ring-border">
-              <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden />
-              Selfcare, your way · România
-            </div>
-            <h1 className="max-w-3xl text-4xl font-medium leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
-              Find your people for whatever selfcare means to you.
-            </h1>
-            <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Hair, tattoo, massage, nails and more — discover specialists near you, see how they
-              work, and book in a few taps. Calm, considered, no pressure.
-            </p>
-            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <Button asChild size="lg" className="h-12 gap-2 px-6">
-                <Link href="/services">
-                  Get started <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-12 px-6">
-                <Link href="#how">How it works</Link>
-              </Button>
-            </div>
-          </section>
-
-          {/* Category strip */}
-          <section className="pb-6">
-            <div className="-mr-5 overflow-x-auto sm:mr-0">
-              <div className="container flex w-max gap-2.5 sm:w-full sm:flex-wrap sm:justify-center">
-                {CATEGORIES.map((c) => (
-                  <Link
-                    key={c.id}
-                    href={`/discover?category=${c.id}`}
-                    className="flex shrink-0 items-center gap-2 rounded-full bg-card px-4 py-2.5 text-sm font-medium shadow-sm ring-1 ring-border transition-transform hover:-translate-y-0.5"
-                  >
-                    <span aria-hidden>{c.emoji}</span>
-                    {c.name}
-                  </Link>
-                ))}
+          {/* Top kicker — pinned to top */}
+          <div className="relative z-10 pt-6">
+            <div className="container">
+              <div className="inline-flex items-center gap-2 rounded-full bg-background/50 px-4 py-1.5 text-xs font-medium text-foreground backdrop-blur-md ring-1 ring-foreground/15">
+                <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden />
+                Selfcare, your way · România
               </div>
             </div>
-          </section>
+          </div>
 
-          {/* How it works */}
-          <section id="how" className="scroll-mt-20">
-            <CurvedDivider />
-            <div className="bg-card/60 py-16">
-              <div className="container">
-                <h2 className="mb-10 text-center text-2xl font-medium tracking-tight sm:text-3xl">
-                  Three taps to booked.
-                </h2>
-                <div className="grid gap-6 sm:grid-cols-3">
-                  <Step
-                    icon={<Search className="size-5" />}
-                    n="01"
-                    title="Choose a service"
-                    body="Pick what you’re in the mood for — from a fresh cut to a deep-tissue massage."
-                  />
-                  <Step
-                    icon={<MapPin className="size-5" />}
-                    n="02"
-                    title="Discover nearby"
-                    body="See specialists on a map, browse their work, read real reviews."
-                  />
-                  <Step
-                    icon={<CalendarCheck className="size-5" />}
-                    n="03"
-                    title="Book in seconds"
-                    body="Pick a time, confirm, pay. One place — no chasing DMs."
-                  />
-                </div>
-              </div>
-            </div>
-            <CurvedDivider flip />
-          </section>
-
-          {/* Featured studios */}
-          <section className="container py-16">
-            <div className="mb-8 flex items-baseline justify-between">
-              <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">Featured this week</h2>
-              <Link
-                href="/services"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          {/* Bottom block — brand line, headline, CTAs */}
+          <div className="absolute inset-x-0 bottom-0 z-10 pb-14 sm:pb-20">
+            <div className="container">
+              <div
+                className="font-mono text-[11px] uppercase tracking-[0.35em] text-accent"
+                style={{ textShadow: '0 1px 12px rgb(0 0 0 / 0.6)' }}
               >
-                See all
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {featured.map((s) => (
-                <Link
-                  key={s.id}
-                  href={`/studio/${s.id}`}
-                  className="group overflow-hidden rounded-3xl bg-card shadow-sm ring-1 ring-border transition-transform hover:-translate-y-0.5"
+                Heia
+              </div>
+              <h1
+                className="mt-3 max-w-3xl text-4xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl"
+                style={{ textShadow: '0 2px 24px rgb(0 0 0 / 0.55)' }}
+              >
+                Find your people for whatever selfcare means to you.
+              </h1>
+              <p
+                className="mt-5 max-w-xl text-base leading-relaxed text-foreground/85 sm:text-lg"
+                style={{ textShadow: '0 1px 16px rgb(0 0 0 / 0.5)' }}
+              >
+                Hair, tattoo, massage, nails and more — discover specialists near you, see how they
+                work, and book in a few taps. Calm, considered, no pressure.
+              </p>
+              <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+                <Button asChild size="lg" className="h-12 gap-2 px-6">
+                  <Link href="/services">
+                    Get started <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="h-12 border-foreground/30 bg-background/30 px-6 text-foreground backdrop-blur-md hover:bg-background/50"
                 >
-                  <div className="aspect-[4/5] overflow-hidden">
-                    <img
-                      src={img.square(s.heroSeed)}
-                      alt=""
-                      className="size-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-3">
-                    <div className="truncate text-sm font-medium">{s.name}</div>
-                    <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                      <Star className="size-3 fill-current text-accent" /> {s.rating} ·{' '}
-                      {formatLei(s.priceFromLei)}+
-                    </div>
-                  </div>
+                  <Link href="#how">How it works</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =====================================================
+            Category strip
+            ===================================================== */}
+        <section className="border-b border-border/60 py-6">
+          <div className="-mr-5 overflow-x-auto sm:mr-0">
+            <div className="container flex w-max gap-2.5 sm:w-full sm:flex-wrap sm:justify-center">
+              {CATEGORIES.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/discover?category=${c.id}`}
+                  className="flex shrink-0 items-center gap-2 rounded-full bg-card px-4 py-2.5 text-sm font-medium ring-1 ring-border transition-all hover:-translate-y-0.5 hover:ring-accent/50"
+                >
+                  <span aria-hidden>{c.emoji}</span>
+                  {c.name}
                 </Link>
               ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Closing CTA */}
-          <section className="container pb-20">
-            <div className="overflow-hidden rounded-[2rem] bg-primary px-6 py-12 text-center text-primary-foreground sm:py-16">
-              <h2 className="mx-auto max-w-xl text-2xl font-medium tracking-tight sm:text-3xl">
-                Your time, your ritual. Whenever you need it.
+        {/* =====================================================
+            How it works
+            ===================================================== */}
+        <section id="how" className="scroll-mt-20 bg-card/40 py-20">
+          <div className="container">
+            <div className="mb-10 text-center">
+              <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
+                How it works
+              </div>
+              <h2 className="mt-3 text-2xl font-medium tracking-tight sm:text-3xl">
+                Three taps to booked.
               </h2>
-              <p className="mx-auto mt-3 max-w-md text-sm opacity-80">
-                Join Heia and find the people who get your vibe.
-              </p>
-              <Button asChild size="lg" variant="secondary" className="mt-8 h-12 gap-2 px-6">
-                <Link href="/services">
-                  Get started <ArrowRight className="size-4" />
-                </Link>
-              </Button>
             </div>
-          </section>
-        </main>
+            <div className="grid gap-6 sm:grid-cols-3">
+              <Step
+                icon={<Search className="size-5" />}
+                n="01"
+                title="Choose a service"
+                body="Pick what you’re in the mood for — from a fresh cut to a deep-tissue massage."
+              />
+              <Step
+                icon={<MapPin className="size-5" />}
+                n="02"
+                title="Discover nearby"
+                body="See specialists on a map, browse their work, read real reviews."
+              />
+              <Step
+                icon={<CalendarCheck className="size-5" />}
+                n="03"
+                title="Book in seconds"
+                body="Pick a time, confirm, pay. One place — no chasing DMs."
+              />
+            </div>
+          </div>
+        </section>
 
-        <SiteFooter />
-      </div>
+        {/* =====================================================
+            Tools-of-the-craft (flatlay) — full-bleed image with copy on the side
+            ===================================================== */}
+        <section className="relative">
+          <div className="grid lg:grid-cols-5">
+            <div
+              className="relative min-h-[60dvh] bg-cover bg-center lg:col-span-3"
+              style={{
+                backgroundImage: `
+                  url('/brand/heia-flatlay.jpg'),
+                  linear-gradient(135deg, hsl(0 45% 20%) 0%, hsl(30 14% 12%) 100%)
+                `,
+              }}
+              aria-hidden
+            />
+            <div className="flex items-center bg-background py-16 lg:col-span-2 lg:py-24">
+              <div className="container max-w-md">
+                <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
+                  Craft, not gimmick
+                </div>
+                <h2 className="mt-3 text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
+                  Specialists who care about the small things.
+                </h2>
+                <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+                  Every profile on Heia is a person who shows up for their craft. You see the work
+                  before you see the price.
+                </p>
+                <Button asChild size="lg" variant="secondary" className="mt-8 h-12 gap-2 px-6">
+                  <Link href="/services">
+                    Browse specialists <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =====================================================
+            For everyone — barber image, inclusivity copy
+            ===================================================== */}
+        <section className="relative">
+          <div
+            className="relative flex min-h-[78dvh] items-center bg-cover bg-center"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, hsl(var(--background)) 0%, hsl(var(--background) / 0.35) 45%, hsl(var(--background) / 0) 100%),
+                url('/brand/heia-barber.jpg'),
+                linear-gradient(135deg, hsl(30 22% 12%) 0%, hsl(20 18% 16%) 100%)
+              `,
+            }}
+          >
+            <div className="container relative z-10">
+              <div className="max-w-xl">
+                <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
+                  For everyone
+                </div>
+                <h2
+                  className="mt-3 text-3xl font-medium leading-tight tracking-tight sm:text-4xl md:text-5xl"
+                  style={{ textShadow: '0 2px 20px rgb(0 0 0 / 0.55)' }}
+                >
+                  All self-care services. Beard, skin, hair, grooming.
+                </h2>
+                <p
+                  className="mt-5 text-base leading-relaxed text-foreground/90 sm:text-lg"
+                  style={{ textShadow: '0 1px 16px rgb(0 0 0 / 0.5)' }}
+                >
+                  Wellbeing doesn’t look the same on everyone. Heia is built for all of it — every
+                  age, every gender, every kind of ritual.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* =====================================================
+            Featured studios
+            ===================================================== */}
+        <section className="container py-20">
+          <div className="mb-8 flex items-baseline justify-between">
+            <div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
+                Featured
+              </div>
+              <h2 className="mt-2 text-2xl font-medium tracking-tight sm:text-3xl">
+                People worth a visit this week.
+              </h2>
+            </div>
+            <Link
+              href="/services"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              See all
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {featured.map((s) => (
+              <Link
+                key={s.id}
+                href={`/studio/${s.id}`}
+                className="group overflow-hidden rounded-3xl bg-card ring-1 ring-border transition-all hover:-translate-y-0.5 hover:ring-accent/50"
+              >
+                <div className="aspect-[4/5] overflow-hidden">
+                  <img
+                    src={img.square(s.heroSeed)}
+                    alt=""
+                    className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-3">
+                  <div className="truncate text-sm font-medium">{s.name}</div>
+                  <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                    <Star className="size-3 fill-current text-accent" /> {s.rating} ·{' '}
+                    {formatLei(s.priceFromLei)}+
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* =====================================================
+            Closing CTA
+            ===================================================== */}
+        <section className="container pb-24">
+          <div
+            className="overflow-hidden rounded-[2rem] px-6 py-16 text-center sm:py-20"
+            style={{
+              backgroundImage:
+                'radial-gradient(ellipse at top, hsl(16 53% 32%) 0%, hsl(30 14% 9%) 70%)',
+            }}
+          >
+            <div className="font-mono text-[11px] uppercase tracking-[0.35em] text-accent">
+              Heia
+            </div>
+            <h2 className="mx-auto mt-3 max-w-xl text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+              Your time, your ritual. Whenever you need it.
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-sm text-foreground/70">
+              Join Heia and find the people who get your vibe.
+            </p>
+            <Button asChild size="lg" className="mt-8 h-12 gap-2 px-6">
+              <Link href="/services">
+                Get started <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+      </main>
+
+      <SiteFooter />
     </div>
   );
 }
@@ -178,11 +312,11 @@ function Step({
   body: string;
 }) {
   return (
-    <div className="rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border">
+    <div className="rounded-3xl bg-card p-6 ring-1 ring-border">
       <div className="flex items-center gap-3">
         <div
-          className="grid size-11 place-items-center rounded-full text-foreground"
-          style={{ background: 'hsl(var(--accent) / 0.2)' }}
+          className="grid size-11 place-items-center rounded-full text-accent"
+          style={{ background: 'hsl(var(--accent) / 0.15)' }}
         >
           {icon}
         </div>
@@ -191,19 +325,5 @@ function Step({
       <h3 className="mt-4 text-lg font-medium tracking-tight">{title}</h3>
       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
     </div>
-  );
-}
-
-function CurvedDivider({ flip = false }: { flip?: boolean }) {
-  return (
-    <svg
-      className="block w-full"
-      viewBox="0 0 400 48"
-      preserveAspectRatio="none"
-      aria-hidden
-      style={flip ? { transform: 'scaleY(-1)' } : undefined}
-    >
-      <path d="M 0 32 Q 100 4 200 24 T 400 32 L 400 48 L 0 48 Z" fill="hsl(var(--card) / 0.6)" />
-    </svg>
   );
 }
