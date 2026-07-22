@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { StudioReviews } from '@/components/reviews/studio-reviews';
 import { studioById, categoryById, img, formatLei } from '@/lib/app-mock-data';
 import { getPublicStudioBySlug } from '@/lib/public-studio';
+import { getStudioReviewsBySlug } from '@/lib/reviews-server';
 
 // Reads the session (for owner preview of unpublished pages) → render per request.
 export const dynamic = 'force-dynamic';
@@ -24,6 +25,7 @@ export default async function StudioPage({
   const studio = (await getPublicStudioBySlug(id)) ?? studioById(id);
   if (!studio) notFound();
   const category = categoryById(studio.categoryId);
+  const reviews = await getStudioReviewsBySlug(id);
 
   return (
     <div className="min-h-dvh pb-24">
@@ -121,7 +123,7 @@ export default async function StudioPage({
         })()}
 
         {/* Reviews */}
-        <StudioReviews studioId={studio.id} locale={locale} />
+        <StudioReviews studioSlug={studio.id} reviews={reviews} locale={locale} />
       </main>
 
       {/* Sticky book bar */}

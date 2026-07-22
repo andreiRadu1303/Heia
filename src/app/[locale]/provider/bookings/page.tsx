@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
-import { Check, X } from 'lucide-react';
+import { Check, X, CheckCheck } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { img, formatLei, formatBookingDate } from '@/lib/app-mock-data';
 import { cn } from '@/lib/utils';
-import { acceptBookingAction, declineBookingAction } from './actions';
+import { acceptBookingAction, declineBookingAction, completeBookingAction } from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,7 +119,7 @@ export default async function ProviderBookingsPage({
         ) : (
           <div className="space-y-3">
             {confirmed.map((b) => (
-              <BookingCard key={b.id} booking={b} locale={locale} />
+              <BookingCard key={b.id} booking={b} locale={locale} completable />
             ))}
           </div>
         )}
@@ -145,11 +145,13 @@ function BookingCard({
   booking,
   locale,
   actionable,
+  completable,
   muted,
 }: {
   booking: BookingView;
   locale: string;
   actionable?: boolean;
+  completable?: boolean;
   muted?: boolean;
 }) {
   const dateLabel = formatBookingDate(booking.scheduledAt.slice(0, 10), locale);
@@ -207,6 +209,19 @@ function BookingCard({
             </button>
           </form>
         </div>
+      ) : null}
+
+      {completable ? (
+        <form action={completeBookingAction} className="mt-3">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="bookingId" value={booking.id} />
+          <button
+            type="submit"
+            className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-full border border-border text-sm font-medium hover:bg-secondary"
+          >
+            <CheckCheck className="size-4" /> Mark completed
+          </button>
+        </form>
       ) : null}
     </div>
   );

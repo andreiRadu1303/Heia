@@ -1,29 +1,24 @@
-'use client';
-
-import * as React from 'react';
 import { BadgeCheck, PenLine } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';
 import { img } from '@/lib/app-mock-data';
-import {
-  seedReviews,
-  allReviews,
-  aggregate,
-  overall,
-  tagById,
-  type Review,
-} from '@/lib/reviews';
+import { aggregate, overall, tagById, type Review } from '@/lib/reviews';
 import { Stars } from './stars';
 import { RatingSummary } from './rating-summary';
 
-export function StudioReviews({ studioId, locale }: { studioId: string; locale: string }) {
-  // SSR-safe initial state = deterministic seeds; merge local reviews on mount.
-  const [reviews, setReviews] = React.useState<Review[]>(() => seedReviews(studioId));
-
-  React.useEffect(() => {
-    setReviews(allReviews(studioId));
-  }, [studioId]);
-
+/**
+ * Studio reviews block for the public profile. Reviews are fetched server-side
+ * (real DB rows) and passed in; this component just renders the summary + list.
+ */
+export function StudioReviews({
+  studioSlug,
+  reviews,
+  locale,
+}: {
+  studioSlug: string;
+  reviews: Review[];
+  locale: string;
+}) {
   const agg = aggregate(reviews);
 
   return (
@@ -31,7 +26,7 @@ export function StudioReviews({ studioId, locale }: { studioId: string; locale: 
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-medium tracking-tight">Reviews</h2>
         <Link
-          href={`/studio/${studioId}/review`}
+          href={`/studio/${studioSlug}/review`}
           locale={locale}
           className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:bg-secondary"
         >
@@ -54,6 +49,7 @@ function ReviewCard({ review }: { review: Review }) {
   return (
     <div className="rounded-3xl bg-card p-4 ring-1 ring-border">
       <div className="flex items-center gap-3">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={img.avatar(review.avatarSeed)} alt="" className="size-9 rounded-full object-cover" />
         <div className="flex-1">
           <div className="flex items-center gap-1.5 text-sm font-medium">
