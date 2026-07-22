@@ -158,6 +158,10 @@ export interface Studio {
   gallerySeeds: string[];
   avatarSeed: string;
   heroSeed: string;
+  /** Real uploaded images (Supabase Storage). Fall back to seed placeholders. */
+  heroUrl?: string | null;
+  avatarUrl?: string | null;
+  galleryUrls?: string[];
 }
 
 /** Bucharest-ish centre, with small offsets per studio. */

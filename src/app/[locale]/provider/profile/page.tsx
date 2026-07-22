@@ -3,6 +3,7 @@ import { ExternalLink } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';
 import { getMyStudio } from '@/lib/provider-studio';
+import { StudioMediaEditor } from '@/components/media/studio-media';
 import { ProfileForm } from './profile-form';
 
 export const dynamic = 'force-dynamic';
@@ -36,7 +37,15 @@ export default async function ProviderProfilePage({
       </header>
 
       {studio ? (
-        <ProfileForm studio={studio} locale={locale} />
+        <>
+          <StudioMediaEditor
+            locale={locale}
+            initialAvatar={studio.avatar_url}
+            initialCover={studio.cover_url}
+            initialGallery={studio.gallery_urls}
+          />
+          <ProfileForm studio={studio} locale={locale} />
+        </>
       ) : (
         <div className="rounded-2xl border border-dashed border-border bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
           We couldn’t find a studio for your account. If you just signed up, try reloading. If this

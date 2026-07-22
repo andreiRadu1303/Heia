@@ -35,7 +35,11 @@ export default async function StudioPage({
 
       {/* Hero */}
       <div className="relative h-64 w-full overflow-hidden sm:h-80">
-        <img src={img.hero(studio.heroSeed)} alt="" className="size-full object-cover" />
+        <img
+          src={studio.heroUrl || img.hero(studio.heroSeed)}
+          alt=""
+          className="size-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent" />
         <div className="absolute bottom-4 left-0 right-0 px-5">
           <div className="flex items-center gap-2 text-xs font-medium text-white/85">
@@ -93,16 +97,28 @@ export default async function StudioPage({
         </section>
 
         {/* Gallery */}
-        <section>
-          <h2 className="mb-4 text-xl font-medium tracking-tight">Work</h2>
-          <div className="grid grid-cols-3 gap-2">
-            {studio.gallerySeeds.map((seed) => (
-              <div key={seed} className="aspect-square overflow-hidden rounded-2xl ring-1 ring-border">
-                <img src={img.square(seed)} alt="" className="size-full object-cover" />
+        {(() => {
+          const gallery =
+            studio.galleryUrls && studio.galleryUrls.length > 0
+              ? studio.galleryUrls
+              : studio.gallerySeeds.map((s) => img.square(s));
+          if (gallery.length === 0) return null;
+          return (
+            <section>
+              <h2 className="mb-4 text-xl font-medium tracking-tight">Work</h2>
+              <div className="grid grid-cols-3 gap-2">
+                {gallery.map((src) => (
+                  <div
+                    key={src}
+                    className="aspect-square overflow-hidden rounded-2xl ring-1 ring-border"
+                  >
+                    <img src={src} alt="" className="size-full object-cover" />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
+          );
+        })()}
 
         {/* Reviews */}
         <StudioReviews studioId={studio.id} locale={locale} />

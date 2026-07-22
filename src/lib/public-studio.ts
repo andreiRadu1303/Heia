@@ -23,6 +23,9 @@ interface PublicStudioRow {
   hero_seed: string | null;
   avatar_seed: string | null;
   gallery_seeds: string[] | null;
+  avatar_url: string | null;
+  cover_url: string | null;
+  gallery_urls: string[] | null;
 }
 
 interface ServiceRow {
@@ -46,7 +49,7 @@ export async function getPublicStudioBySlug(slug: string): Promise<Studio | null
   const { data: row } = await supabase
     .from('studios')
     .select(
-      'id, slug, name, category_id, tagline, bio, city, address, lat, lng, known_for, price_from_lei, rating, review_count, hero_seed, avatar_seed, gallery_seeds',
+      'id, slug, name, category_id, tagline, bio, city, address, lat, lng, known_for, price_from_lei, rating, review_count, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls',
     )
     .eq('slug', slug)
     .maybeSingle();
@@ -88,5 +91,8 @@ export async function getPublicStudioBySlug(slug: string): Promise<Studio | null
     gallerySeeds: studio.gallery_seeds ?? [],
     avatarSeed: studio.avatar_seed ?? studio.slug,
     heroSeed: studio.hero_seed ?? studio.slug,
+    heroUrl: studio.cover_url,
+    avatarUrl: studio.avatar_url,
+    galleryUrls: studio.gallery_urls ?? [],
   };
 }
