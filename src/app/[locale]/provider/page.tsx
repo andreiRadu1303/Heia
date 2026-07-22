@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import {
   Star,
@@ -35,6 +36,9 @@ export default async function ProviderHome({
     : { data: null };
 
   const studio = await getMyStudio();
+
+  // First-run: send new experts through onboarding before the dashboard.
+  if (studio && !studio.onboarded_at) redirect(`/${locale}/provider/onboarding`);
 
   let serviceCount = 0;
   if (studio) {

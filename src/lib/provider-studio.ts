@@ -22,10 +22,11 @@ export interface StudioRow {
   avatar_seed: string | null;
   gallery_seeds: string[];
   site_config: unknown;
+  onboarded_at: string | null;
 }
 
 const STUDIO_COLUMNS =
-  'id, slug, name, category_id, tagline, bio, city, address, known_for, price_from_lei, rating, review_count, is_published, hero_seed, avatar_seed, gallery_seeds, site_config';
+  'id, slug, name, category_id, tagline, bio, city, address, known_for, price_from_lei, rating, review_count, is_published, hero_seed, avatar_seed, gallery_seeds, site_config, onboarded_at';
 
 /**
  * The signed-in expert's own studio (created for them at signup). Returns null
