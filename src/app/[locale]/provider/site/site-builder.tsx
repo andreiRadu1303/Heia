@@ -13,6 +13,7 @@ import {
   LayoutTemplate,
   Palette,
   Layers,
+  Loader2,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -33,69 +34,60 @@ import {
   type DensityId,
   type TemplateId,
 } from '@/lib/site-config';
+import { saveSiteConfigAction } from './actions';
 
 type Panel = 'template' | 'theme' | 'sections';
 type Device = 'desktop' | 'phone';
+type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
 
-function storageKey(studioId: string) {
-  return `heia:site-config:${studioId}`;
-}
-
-function loadConfig(studioId: string): SiteConfig {
-  if (typeof window === 'undefined') return defaultConfig();
-  try {
-    const raw = window.localStorage.getItem(storageKey(studioId));
-    if (raw) {
-      const parsed = JSON.parse(raw) as SiteConfig;
-      if (parsed && parsed.version === 1 && Array.isArray(parsed.sections)) return parsed;
-    }
-  } catch {
-    /* ignore malformed */
-  }
-  return defaultConfig();
-}
-
-export function SiteBuilder({ studio, locale }: { studio: Studio; locale: string }) {
-  const [config, setConfig] = React.useState<SiteConfig>(() => defaultConfig());
+export function SiteBuilder({
+  studio,
+  locale,
+  initialConfig,
+}: {
+  studio: Studio;
+  locale: string;
+  initialConfig: SiteConfig | null;
+}) {
+  const [config, setConfig] = React.useState<SiteConfig>(() => initialConfig ?? defaultConfig());
   const [panel, setPanel] = React.useState<Panel>('template');
   const [device, setDevice] = React.useState<Device>('phone');
-  const [hydrated, setHydrated] = React.useState(false);
+  const [save, setSave] = React.useState<SaveState>('idle');
+  const [isPending, startTransition] = React.useTransition();
 
-  // Load persisted config after mount (avoids SSR/CSR mismatch).
-  React.useEffect(() => {
-    setConfig(loadConfig(studio.id));
-    setHydrated(true);
-  }, [studio.id]);
+  // Any edit marks the design dirty (unless we're mid-save).
+  const edit = React.useCallback((updater: (c: SiteConfig) => SiteConfig) => {
+    setConfig(updater);
+    setSave('dirty');
+  }, []);
 
-  // Persist on every change once hydrated.
-  React.useEffect(() => {
-    if (!hydrated) return;
-    try {
-      window.localStorage.setItem(storageKey(studio.id), JSON.stringify(config));
-    } catch {
-      /* quota / private mode — non-fatal */
-    }
-  }, [config, hydrated, studio.id]);
+  const persist = () => {
+    setSave('saving');
+    startTransition(async () => {
+      const res = await saveSiteConfigAction(config);
+      setSave(res.ok ? 'saved' : 'error');
+    });
+  };
 
   const patchTheme = (patch: Partial<ThemeConfig>) =>
-    setConfig((c) => ({ ...c, theme: { ...c.theme, ...patch } }));
+    edit((c) => ({ ...c, theme: { ...c.theme, ...patch } }));
 
-  const applyTemplate = (id: TemplateId) => setConfig(configFromTemplate(id));
+  const applyTemplate = (id: TemplateId) => edit(() => configFromTemplate(id));
 
   const toggleSection = (key: string) =>
-    setConfig((c) => ({
+    edit((c) => ({
       ...c,
       sections: c.sections.map((s) => (s.key === key ? { ...s, enabled: !s.enabled } : s)),
     }));
 
   const setVariant = (key: string, variant: string) =>
-    setConfig((c) => ({
+    edit((c) => ({
       ...c,
       sections: c.sections.map((s) => (s.key === key ? { ...s, variant } : s)),
     }));
 
   const moveSection = (index: number, dir: -1 | 1) =>
-    setConfig((c) => {
+    edit((c) => {
       const next = [...c.sections];
       const target = index + dir;
       if (target < 0 || target >= next.length) return c;
@@ -127,13 +119,36 @@ export function SiteBuilder({ studio, locale }: { studio: Studio; locale: string
           </div>
           <button
             type="button"
-            onClick={() => setConfig(configFromTemplate(config.template))}
+            onClick={() => edit(() => configFromTemplate(config.template))}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm hover:bg-secondary"
           >
             <RotateCcw className="size-4" /> Reset
           </button>
+          <button
+            type="button"
+            onClick={persist}
+            disabled={isPending || save === 'saved' || save === 'idle'}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background disabled:opacity-50"
+          >
+            {save === 'saving' ? (
+              <>
+                <Loader2 className="size-4 animate-spin" /> Saving…
+              </>
+            ) : save === 'saved' ? (
+              <>
+                <Check className="size-4" /> Saved
+              </>
+            ) : (
+              'Save'
+            )}
+          </button>
         </div>
       </header>
+      {save === 'error' ? (
+        <p className="mt-3 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          Couldn’t save. Make sure migration 006 (site_config) has been run, then try again.
+        </p>
+      ) : null}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[360px_1fr]">
         {/* ---------------- Controls ---------------- */}
@@ -325,8 +340,9 @@ export function SiteBuilder({ studio, locale }: { studio: Studio; locale: string
           ) : null}
 
           <p className="rounded-xl border border-dashed border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            Saved in this browser for now. Publishing to your live profile comes with the database
-            step.
+            {save === 'dirty'
+              ? 'Unsaved changes — hit Save to store your design.'
+              : 'Your design is saved to your studio. The public page renders from it once content editing is wired.'}
           </p>
         </div>
 
