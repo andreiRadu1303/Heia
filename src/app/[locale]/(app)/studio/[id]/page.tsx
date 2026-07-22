@@ -5,6 +5,7 @@ import { Star, MapPin, Clock } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { AppTopBar } from '@/components/app/app-top-bar';
 import { Button } from '@/components/ui/button';
+import { StudioReviews } from '@/components/reviews/studio-reviews';
 import { studioById, categoryById, img, formatLei } from '@/lib/app-mock-data';
 
 export default async function StudioPage({
@@ -99,30 +100,7 @@ export default async function StudioPage({
         </section>
 
         {/* Reviews */}
-        <section>
-          <h2 className="mb-4 text-xl font-medium tracking-tight">Reviews</h2>
-          <div className="space-y-3">
-            {studio.reviews.map((rev) => (
-              <div key={rev.id} className="rounded-3xl bg-card p-4 ring-1 ring-border">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={img.avatar(rev.avatarSeed)}
-                    alt=""
-                    className="size-9 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">{rev.author}</div>
-                    <div className="text-xs text-muted-foreground">{rev.ago}</div>
-                  </div>
-                  <div className="inline-flex items-center gap-1 text-xs">
-                    <Star className="size-3 fill-current text-accent" /> {rev.rating}
-                  </div>
-                </div>
-                <p className="mt-2.5 text-sm leading-relaxed text-foreground/90">{rev.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <StudioReviews studioId={studio.id} locale={locale} />
       </main>
 
       {/* Sticky book bar */}
