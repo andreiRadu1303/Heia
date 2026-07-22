@@ -42,14 +42,14 @@ export default function ProviderAvailabilityPage() {
               aria-label={`Toggle ${h.day}`}
               onClick={() => toggle(h.day)}
               className={cn(
-                'relative h-6 w-10 shrink-0 rounded-full transition-colors',
+                'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors',
                 h.enabled ? 'bg-accent' : 'bg-border',
               )}
             >
               <span
                 className={cn(
-                  'absolute top-0.5 size-5 rounded-full bg-background shadow transition-transform',
-                  h.enabled ? 'translate-x-[18px]' : 'translate-x-0.5',
+                  'inline-block size-5 rounded-full bg-background shadow transition-transform',
+                  h.enabled ? 'translate-x-[22px]' : 'translate-x-[2px]',
                 )}
               />
             </button>

@@ -30,11 +30,15 @@ export async function signupAction(
     process.env.NEXT_PUBLIC_SITE_URL ??
     `https://${headerList.get('host') ?? 'localhost:3000'}`;
 
-  const { error } = await supabase.auth.signUp({
+  // Where the user should end up after signing up. Providers go to /provider,
+  // which forwards first-timers into onboarding; clients to /dashboard.
+  const destination = role === 'provider' ? `/${locale}/provider` : `/${locale}/dashboard`;
+
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/confirm?next=/${locale}/dashboard`,
+      emailRedirectTo: `${origin}/auth/confirm?next=${destination}`,
       data: {
         display_name: displayName,
         locale,
@@ -52,6 +56,13 @@ export async function signupAction(
       return { error: 'errorEmailInUse' };
     }
     return { error: 'errorGeneric' };
+  }
+
+  // Email confirmation OFF → a session is returned immediately, so send them
+  // straight to their destination. Confirmation ON → no session yet, so ask
+  // them to check their email.
+  if (data.session) {
+    redirect(destination);
   }
 
   redirect(`/${locale}/auth/check-email`);
