@@ -1,5 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
+import { ExternalLink } from 'lucide-react';
 
+import { Link } from '@/i18n/navigation';
 import { getMyStudio } from '@/lib/provider-studio';
 import { ProfileForm } from './profile-form';
 
@@ -17,9 +19,20 @@ export default async function ProviderProfilePage({
 
   return (
     <main className="container max-w-2xl space-y-6 pt-8">
-      <header>
-        <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Studio profile</h1>
-        <p className="mt-2 text-muted-foreground">How clients see you on Heia.</p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Studio profile</h1>
+          <p className="mt-2 text-muted-foreground">How clients see you on Heia.</p>
+        </div>
+        {studio ? (
+          <Link
+            href={`/studio/${studio.slug}`}
+            target="_blank"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-secondary"
+          >
+            <ExternalLink className="size-4" /> View as client
+          </Link>
+        ) : null}
       </header>
 
       {studio ? (

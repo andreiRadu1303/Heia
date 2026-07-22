@@ -9,6 +9,7 @@ import {
   LayoutTemplate,
   User,
   ArrowUpRight,
+  ExternalLink,
   Globe,
   EyeOff,
 } from 'lucide-react';
@@ -127,6 +128,26 @@ export default async function ProviderHome({
               <ManageCard href="/provider/availability" icon={<Clock className="size-5" />} title="Hours" hint="Your weekly schedule" />
               <ManageCard href="/provider/bookings" icon={<CalendarDays className="size-5" />} title="Bookings" hint="Requests & schedule" />
             </div>
+          </section>
+
+          {/* View public page */}
+          <section>
+            <Link
+              href={`/studio/${studio.slug}`}
+              target="_blank"
+              className="flex items-center gap-3 rounded-3xl bg-card p-4 ring-1 ring-border transition-transform hover:-translate-y-0.5"
+            >
+              <span className="grid size-10 place-items-center rounded-full bg-accent/20">
+                <ExternalLink className="size-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="font-medium">View your public page</div>
+                <div className="truncate text-sm text-muted-foreground">
+                  See exactly what clients see
+                </div>
+              </div>
+              <ArrowUpRight className="size-5 shrink-0 text-muted-foreground" />
+            </Link>
           </section>
 
           {/* Site builder link */}

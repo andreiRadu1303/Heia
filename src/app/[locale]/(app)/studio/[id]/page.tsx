@@ -7,6 +7,10 @@ import { AppTopBar } from '@/components/app/app-top-bar';
 import { Button } from '@/components/ui/button';
 import { StudioReviews } from '@/components/reviews/studio-reviews';
 import { studioById, categoryById, img, formatLei } from '@/lib/app-mock-data';
+import { getPublicStudioBySlug } from '@/lib/public-studio';
+
+// Reads the session (for owner preview of unpublished pages) → render per request.
+export const dynamic = 'force-dynamic';
 
 export default async function StudioPage({
   params,
@@ -16,7 +20,8 @@ export default async function StudioPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const studio = studioById(id);
+  // Real studio first (by slug), falling back to the seeded demo studios.
+  const studio = (await getPublicStudioBySlug(id)) ?? studioById(id);
   if (!studio) notFound();
   const category = categoryById(studio.categoryId);
 
