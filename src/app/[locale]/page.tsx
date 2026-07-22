@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { Button } from '@/components/ui/button';
-import { CATEGORIES, STUDIOS, img, formatLei } from '@/lib/app-mock-data';
+import { STUDIOS, img, formatLei } from '@/lib/app-mock-data';
 
 export default async function LandingPage({
   params,
@@ -86,26 +86,6 @@ export default async function LandingPage({
                   <Link href="#how">How it works</Link>
                 </Button>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* =====================================================
-            Category strip
-            ===================================================== */}
-        <section className="border-b border-border/60 py-6">
-          <div className="-mr-5 overflow-x-auto sm:mr-0">
-            <div className="container flex w-max gap-2.5 sm:w-full sm:flex-wrap sm:justify-center">
-              {CATEGORIES.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/discover?category=${c.id}`}
-                  className="flex shrink-0 items-center gap-2 rounded-full bg-card px-4 py-2.5 text-sm font-medium ring-1 ring-border transition-all hover:-translate-y-0.5 hover:ring-accent/50"
-                >
-                  <span aria-hidden>{c.emoji}</span>
-                  {c.name}
-                </Link>
-              ))}
             </div>
           </div>
         </section>
