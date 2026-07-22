@@ -62,7 +62,20 @@
     "errorGeneric": "Something went wrong. Try again.",
     "errorInvalidCredentials": "Wrong email or password.",
     "errorEmailInUse": "This email is already registered. Try signing in.",
-    "errorEmailNotConfirmed": "Please confirm your email before signing in."
+    "errorEmailNotConfirmed": "Please confirm your email before signing in.",
+    "chooseTitle": "How do you want to use Heia?",
+    "chooseSubtitle": "Choose your account type. You can always make a separate account for the other role.",
+    "chooseClientTitle": "I'm looking for a specialist",
+    "chooseClientDesc": "Discover artists that match your vibe and book in seconds.",
+    "chooseProviderTitle": "I'm a specialist",
+    "chooseProviderDesc": "Build your profile, attract new clients and get discovered.",
+    "chooseCta": "Continue",
+    "signupClientTitle": "Client account",
+    "signupClientSubtitle": "Discover and book specialists in seconds.",
+    "signupProviderTitle": "Specialist account",
+    "signupProviderSubtitle": "A premium profile, exposure and bookings in one place.",
+    "signupProviderSubmit": "Create profile",
+    "changeRole": "Not you? Change account type"
   },
   "Stub": {
     "comingSoon": "Coming soon",

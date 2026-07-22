@@ -34,7 +34,22 @@ export async function passwordLoginAction(
     return { error: 'errorGeneric' };
   }
 
-  redirect(`/${locale}/dashboard`);
+  // Route each role to its own home — experts go straight to /provider
+  // (no dashboard flash), clients to /dashboard.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let destination = `/${locale}/dashboard`;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (profile?.role === 'provider') destination = `/${locale}/provider`;
+  }
+
+  redirect(destination);
 }
 
 export async function magicLinkLoginAction(

@@ -62,7 +62,20 @@
     "errorGeneric": "Ceva nu a mers bine. Mai încearcă o dată.",
     "errorInvalidCredentials": "Email sau parolă incorecte.",
     "errorEmailInUse": "Acest email este deja folosit. Autentifică-te.",
-    "errorEmailNotConfirmed": "Te rugăm să confirmi adresa de email înainte de autentificare."
+    "errorEmailNotConfirmed": "Te rugăm să confirmi adresa de email înainte de autentificare.",
+    "chooseTitle": "Cum vrei să folosești Heia?",
+    "chooseSubtitle": "Alege tipul de cont. Îți poți face oricând un cont separat pentru celălalt rol.",
+    "chooseClientTitle": "Caut un specialist",
+    "chooseClientDesc": "Descoperă artiști care ți se potrivesc și rezervă în câteva secunde.",
+    "chooseProviderTitle": "Sunt specialist",
+    "chooseProviderDesc": "Creează-ți profilul, atrage clienți noi și fii descoperit(ă).",
+    "chooseCta": "Continuă",
+    "signupClientTitle": "Cont de client",
+    "signupClientSubtitle": "Descoperă și rezervă specialiști în câteva secunde.",
+    "signupProviderTitle": "Cont de specialist",
+    "signupProviderSubtitle": "Profil premium, expunere și programări într-un singur loc.",
+    "signupProviderSubmit": "Creează profil",
+    "changeRole": "Nu ești tu? Schimbă tipul de cont"
   },
   "Stub": {
     "comingSoon": "În curând",

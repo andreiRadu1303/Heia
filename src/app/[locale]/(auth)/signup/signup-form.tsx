@@ -13,36 +13,48 @@ import { signupAction, type SignupState } from './actions';
 
 const initialState: SignupState = {};
 
-export function SignupForm({ locale }: { locale: string }) {
+export function SignupForm({
+  locale,
+  role: fixedRole,
+}: {
+  locale: string;
+  /** When set, the account type is locked (chosen on the gateway screen) and
+   *  the in-form role toggle is hidden. When omitted, the toggle is shown. */
+  role?: 'client' | 'provider';
+}) {
   const t = useTranslations('Auth');
   const [state, formAction] = useActionState(signupAction, initialState);
-  const [role, setRole] = React.useState<'client' | 'provider'>('client');
+  const [role, setRole] = React.useState<'client' | 'provider'>(fixedRole ?? 'client');
+
+  const submitLabel = role === 'provider' ? t('signupProviderSubmit') : t('signupSubmit');
 
   return (
     <form action={formAction} className="space-y-4" noValidate>
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="role" value={role} />
 
-      {/* Role selector */}
-      <div className="space-y-1.5">
-        <span className="text-sm font-medium">{t('roleIntro')}</span>
-        <div className="grid grid-cols-2 gap-2">
-          <RoleCard
-            active={role === 'client'}
-            onClick={() => setRole('client')}
-            icon={<CalendarHeart className="size-5" />}
-            label={t('roleClient')}
-            hint={t('roleClientHint')}
-          />
-          <RoleCard
-            active={role === 'provider'}
-            onClick={() => setRole('provider')}
-            icon={<Sparkles className="size-5" />}
-            label={t('roleProvider')}
-            hint={t('roleProviderHint')}
-          />
+      {/* Role selector — only when the role wasn't already chosen on the gateway */}
+      {!fixedRole ? (
+        <div className="space-y-1.5">
+          <span className="text-sm font-medium">{t('roleIntro')}</span>
+          <div className="grid grid-cols-2 gap-2">
+            <RoleCard
+              active={role === 'client'}
+              onClick={() => setRole('client')}
+              icon={<CalendarHeart className="size-5" />}
+              label={t('roleClient')}
+              hint={t('roleClientHint')}
+            />
+            <RoleCard
+              active={role === 'provider'}
+              onClick={() => setRole('provider')}
+              icon={<Sparkles className="size-5" />}
+              label={t('roleProvider')}
+              hint={t('roleProviderHint')}
+            />
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="space-y-1.5">
         <label htmlFor="display_name" className="text-sm font-medium">
@@ -112,7 +124,7 @@ export function SignupForm({ locale }: { locale: string }) {
         </div>
       ) : null}
 
-      <SubmitButton label={t('signupSubmit')} />
+      <SubmitButton label={submitLabel} />
     </form>
   );
 }
