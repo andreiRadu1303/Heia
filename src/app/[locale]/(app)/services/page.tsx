@@ -18,7 +18,7 @@ export default async function ServicesPage({
 
   return (
     <div className="min-h-dvh pb-16">
-      <AppTopBar title="Choose a service" backHref="/" step="Step 1 of 4" />
+      <AppTopBar title="Choose a service" backHref="/" step="Step 1 of 3" />
 
       <main className="container pt-8">
         <h1 className="text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
@@ -41,15 +41,10 @@ export default async function ServicesPage({
                 aria-hidden
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent" aria-hidden />
-              <div className="absolute inset-0 flex flex-col justify-between p-4">
-                <span className="text-2xl" aria-hidden>
-                  {c.emoji}
-                </span>
-                <div>
-                  <div className="text-lg font-medium tracking-tight text-white">{c.name}</div>
-                  <div className="text-xs text-white/80">
-                    {c.tagline} · {countFor(c.id)} nearby
-                  </div>
+              <div className="absolute inset-0 flex flex-col justify-end p-4">
+                <div className="text-lg font-medium tracking-tight text-white">{c.name}</div>
+                <div className="text-xs text-white/80">
+                  {c.tagline} · {countFor(c.id)} nearby
                 </div>
               </div>
             </Link>

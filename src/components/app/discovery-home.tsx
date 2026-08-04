@@ -366,7 +366,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
                   onClick={onClose}
                   className="rounded-full bg-card px-4 py-2 text-sm ring-1 ring-border"
                 >
-                  {c.emoji} {c.name}
+                  {c.name}
                 </Link>
               ))}
             </div>

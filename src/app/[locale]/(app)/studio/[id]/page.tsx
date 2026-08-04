@@ -32,7 +32,7 @@ export default async function StudioPage({
       <AppTopBar
         title={studio.name}
         backHref={`/discover?category=${studio.categoryId}`}
-        step="Step 3 of 4"
+        step="Step 2 of 3"
       />
 
       {/* Hero */}
@@ -46,7 +46,7 @@ export default async function StudioPage({
         <div className="absolute bottom-4 left-0 right-0 px-5">
           <div className="flex items-center gap-2 text-xs font-medium text-white/85">
             <span className="rounded-full bg-white/95 px-2.5 py-1 text-black/80">
-              {category?.emoji} {category?.name}
+              {category?.name}
             </span>
             <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-black/80">
               <Star className="size-3 fill-current" /> {studio.rating} ({studio.reviewCount})

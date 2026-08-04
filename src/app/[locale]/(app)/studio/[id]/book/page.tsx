@@ -44,7 +44,7 @@ export default async function BookPage({
       <AppTopBar
         title={`Book · ${studio.name}`}
         backHref={`/studio/${slug}`}
-        step="Step 4 of 4"
+        step="Step 3 of 3"
       />
       <BookingClient
         studioSlug={studio.slug}
