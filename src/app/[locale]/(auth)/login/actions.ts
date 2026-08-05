@@ -10,6 +10,12 @@ export interface LoginState {
   magicLinkSent?: boolean;
 }
 
+/** Only allow same-site relative redirects (block open-redirects). */
+function safeNext(value: string): string | null {
+  if (value.startsWith('/') && !value.startsWith('//') && !value.includes('://')) return value;
+  return null;
+}
+
 export async function passwordLoginAction(
   _prev: LoginState,
   formData: FormData,
@@ -17,6 +23,7 @@ export async function passwordLoginAction(
   const email = String(formData.get('email') ?? '').trim();
   const password = String(formData.get('password') ?? '');
   const locale = String(formData.get('locale') ?? 'ro');
+  const next = safeNext(String(formData.get('next') ?? ''));
 
   if (!email || !password) return { error: 'errorGeneric' };
 
@@ -34,8 +41,10 @@ export async function passwordLoginAction(
     return { error: 'errorGeneric' };
   }
 
-  // Route each role to its own home — experts go straight to /provider
-  // (no dashboard flash), clients to /dashboard.
+  // A validated ?next= wins (e.g. returning to a review page). Otherwise route
+  // each role to its own home — experts to /provider, clients to /dashboard.
+  if (next) redirect(next);
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -58,6 +67,7 @@ export async function magicLinkLoginAction(
 ): Promise<LoginState> {
   const email = String(formData.get('email') ?? '').trim();
   const locale = String(formData.get('locale') ?? 'ro');
+  const next = safeNext(String(formData.get('next') ?? ''));
 
   if (!email) return { error: 'errorGeneric' };
 
@@ -67,10 +77,14 @@ export async function magicLinkLoginAction(
     process.env.NEXT_PUBLIC_SITE_URL ??
     `https://${headerList.get('host') ?? 'localhost:3000'}`;
 
+  // Land on `next` if provided; otherwise /dashboard (which forwards providers
+  // to /provider after confirm).
+  const target = next ?? `/${locale}/dashboard`;
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${origin}/auth/confirm?next=/${locale}/dashboard`,
+      emailRedirectTo: `${origin}/auth/confirm?next=${target}`,
     },
   });
 

@@ -75,7 +75,8 @@
     "signupProviderTitle": "Cont de specialist",
     "signupProviderSubtitle": "Profil premium, expunere și programări într-un singur loc.",
     "signupProviderSubmit": "Creează profil",
-    "changeRole": "Nu ești tu? Schimbă tipul de cont"
+    "changeRole": "Nu ești tu? Schimbă tipul de cont",
+    "errorInvalidLink": "Linkul a expirat sau nu este valid. Încearcă din nou."
   },
   "Stub": {
     "comingSoon": "În curând",

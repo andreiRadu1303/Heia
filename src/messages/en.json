@@ -75,7 +75,8 @@
     "signupProviderTitle": "Specialist account",
     "signupProviderSubtitle": "A premium profile, exposure and bookings in one place.",
     "signupProviderSubmit": "Create profile",
-    "changeRole": "Not you? Change account type"
+    "changeRole": "Not you? Change account type",
+    "errorInvalidLink": "That link is invalid or expired. Please try again."
   },
   "Stub": {
     "comingSoon": "Coming soon",

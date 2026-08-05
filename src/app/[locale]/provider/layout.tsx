@@ -1,10 +1,10 @@
 import { setRequestLocale } from 'next-intl/server';
 
 import { requireProvider } from '@/lib/auth-guards';
+import { ProviderNav } from '@/components/app/provider-nav';
 
 // Auth-gated: always run the guard per request, never statically cache.
 export const dynamic = 'force-dynamic';
-import { ProviderNav } from '@/components/app/provider-nav';
 
 export default async function ProviderLayout({
   children,

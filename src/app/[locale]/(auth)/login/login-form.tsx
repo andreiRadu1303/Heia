@@ -14,7 +14,7 @@ const initialState: LoginState = {};
 
 type Mode = 'password' | 'magic';
 
-export function LoginForm({ locale }: { locale: string }) {
+export function LoginForm({ locale, next }: { locale: string; next?: string }) {
   const t = useTranslations('Auth');
   const [mode, setMode] = React.useState<Mode>('password');
 
@@ -30,9 +30,9 @@ export function LoginForm({ locale }: { locale: string }) {
       </div>
 
       {mode === 'password' ? (
-        <PasswordForm locale={locale} />
+        <PasswordForm locale={locale} next={next} />
       ) : (
-        <MagicLinkForm locale={locale} />
+        <MagicLinkForm locale={locale} next={next} />
       )}
     </div>
   );
@@ -61,12 +61,13 @@ function ModeTab({
   );
 }
 
-function PasswordForm({ locale }: { locale: string }) {
+function PasswordForm({ locale, next }: { locale: string; next?: string }) {
   const t = useTranslations('Auth');
   const [state, formAction] = useActionState(passwordLoginAction, initialState);
   return (
     <form action={formAction} className="space-y-3" noValidate>
       <input type="hidden" name="locale" value={locale} />
+      {next ? <input type="hidden" name="next" value={next} /> : null}
       <Field id="email" name="email" type="email" autoComplete="email" required label={t('emailLabel')} placeholder={t('emailPlaceholder')} />
       <Field id="password" name="password" type="password" autoComplete="current-password" required label={t('passwordLabel')} placeholder={t('passwordPlaceholder')} />
       {state.error ? <ErrorBox>{t(state.error as 'errorGeneric')}</ErrorBox> : null}
@@ -75,7 +76,7 @@ function PasswordForm({ locale }: { locale: string }) {
   );
 }
 
-function MagicLinkForm({ locale }: { locale: string }) {
+function MagicLinkForm({ locale, next }: { locale: string; next?: string }) {
   const t = useTranslations('Auth');
   const [state, formAction] = useActionState(magicLinkLoginAction, initialState);
   if (state.magicLinkSent) {
@@ -91,6 +92,7 @@ function MagicLinkForm({ locale }: { locale: string }) {
   return (
     <form action={formAction} className="space-y-3" noValidate>
       <input type="hidden" name="locale" value={locale} />
+      {next ? <input type="hidden" name="next" value={next} /> : null}
       <Field id="ml-email" name="email" type="email" autoComplete="email" required label={t('emailLabel')} placeholder={t('emailPlaceholder')} />
       {state.error ? <ErrorBox>{t(state.error as 'errorGeneric')}</ErrorBox> : null}
       <SubmitButton label={t('magicLinkSubmit')} />
