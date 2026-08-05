@@ -5,7 +5,6 @@ import { Check, CalendarCheck, Lock } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { formatLei } from '@/lib/app-mock-data';
 import { createBookingAction } from './actions';
 
@@ -19,6 +18,8 @@ export interface CheckoutSummary {
   date: string; // YYYY-MM-DD
   time: string; // HH:MM
   locale: string;
+  /** When true, submitting sends the client to Stripe Checkout to pay by card. */
+  payEnabled?: boolean;
 }
 
 export function CheckoutClient(props: CheckoutSummary) {
@@ -77,49 +78,23 @@ export function CheckoutClient(props: CheckoutSummary) {
         <input type="hidden" name="serviceId" value={props.serviceId} />
         <input type="hidden" name="scheduledAt" value={scheduledAt} />
 
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <Lock className="size-4 text-muted-foreground" /> Payment
-        </div>
-
-        {/* Card fields kept as visual placeholders — disabled until Stripe is wired. */}
-        <div className="space-y-1.5 opacity-60">
-          <label htmlFor="card" className="text-sm font-medium">
-            Card number
-          </label>
-          <Input
-            id="card"
-            inputMode="numeric"
-            placeholder="4242 4242 4242 4242"
-            className="h-12 bg-card text-base"
-            disabled
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-3 opacity-60">
-          <div className="space-y-1.5">
-            <label htmlFor="exp" className="text-sm font-medium">
-              Expiry
-            </label>
-            <Input id="exp" placeholder="MM / YY" className="h-12 bg-card text-base" disabled />
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Lock className="size-4 text-muted-foreground" /> Payment
           </div>
-          <div className="space-y-1.5">
-            <label htmlFor="cvc" className="text-sm font-medium">
-              CVC
-            </label>
-            <Input id="cvc" inputMode="numeric" placeholder="123" className="h-12 bg-card text-base" disabled />
-          </div>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            {props.payEnabled
+              ? 'You’ll pay securely by card on the next step (Stripe). The studio receives the payment minus Heia’s platform fee.'
+              : 'No card needed yet — your request goes to the provider as pending and they confirm it.'}
+          </p>
         </div>
-
-        <p className="rounded-2xl border border-dashed bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-          Demo mode — no card is charged. Your booking goes to the provider as <b>pending</b>.
-          They’ll see it on their dashboard and confirm or decline.
-        </p>
 
         <Button type="submit" size="lg" disabled={submitting} className="h-12 w-full gap-2">
           {submitting ? (
             'Sending…'
           ) : (
             <>
-              <Check className="size-4" /> Confirm booking
+              <Check className="size-4" /> {props.payEnabled ? 'Pay & book' : 'Send booking request'}
             </>
           )}
         </Button>

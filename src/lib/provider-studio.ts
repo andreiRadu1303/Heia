@@ -26,10 +26,12 @@ export interface StudioRow {
   gallery_urls: string[];
   site_config: unknown;
   onboarded_at: string | null;
+  stripe_account_id: string | null;
+  stripe_charges_enabled: boolean;
 }
 
 const STUDIO_COLUMNS =
-  'id, slug, name, category_id, tagline, bio, city, address, known_for, price_from_lei, rating, review_count, is_published, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls, site_config, onboarded_at';
+  'id, slug, name, category_id, tagline, bio, city, address, known_for, price_from_lei, rating, review_count, is_published, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls, site_config, onboarded_at, stripe_account_id, stripe_charges_enabled';
 
 /**
  * The signed-in expert's own studio (created for them at signup). Returns null

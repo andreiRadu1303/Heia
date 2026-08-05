@@ -1,14 +1,28 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 
 import { createClient } from '@/lib/supabase/server';
+import { getStripe } from '@/lib/stripe/client';
+import {
+  isStripeConfigured,
+  toMinor,
+  applicationFeeMinor,
+  STRIPE_CURRENCY,
+} from '@/lib/stripe/config';
+
+interface JoinedStudio {
+  slug: string;
+  stripe_account_id: string | null;
+  stripe_charges_enabled: boolean;
+}
 
 /**
- * Insert a real booking row in Supabase from the checkout "pay" button.
- * For now this is the entire payment step — no Stripe integration yet —
- * so the booking lands as `pending`. The provider sees it on their
- * dashboard and accepts/declines.
+ * Create a booking, then — if the expert has Stripe payouts enabled — send the
+ * client to Stripe Checkout with the platform's application fee split out. If
+ * Stripe isn't set up for this studio, the booking simply lands as `pending`
+ * and the provider confirms it (no payment).
  */
 export async function createBookingAction(formData: FormData) {
   const locale = String(formData.get('locale') ?? 'ro');
@@ -17,7 +31,6 @@ export async function createBookingAction(formData: FormData) {
   const scheduledAt = String(formData.get('scheduledAt') ?? '');
   const notes = (String(formData.get('notes') ?? '').trim() || null) as string | null;
 
-  // Need the basics; otherwise punt to services.
   if (!studioSlug || !serviceId || !scheduledAt) {
     redirect(`/${locale}/services`);
   }
@@ -27,14 +40,14 @@ export async function createBookingAction(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    // Bounce to login; client comes back to checkout via the next param.
     redirect(`/${locale}/login`);
   }
 
-  // Validate the service belongs to that studio (and capture snapshot fields).
   const { data: service, error: svcErr } = await supabase
     .from('services')
-    .select('id, name, duration_min, price_lei, studio_id, studios!inner(slug)')
+    .select(
+      'id, name, duration_min, price_lei, studio_id, studios!inner(slug, stripe_account_id, stripe_charges_enabled)',
+    )
     .eq('id', serviceId)
     .eq('studios.slug', studioSlug)
     .maybeSingle();
@@ -43,21 +56,73 @@ export async function createBookingAction(formData: FormData) {
     redirect(`/${locale}/services`);
   }
 
-  const { error: insErr } = await supabase.from('bookings').insert({
-    studio_id: service.studio_id,
-    service_id: service.id,
-    client_id: user.id,
-    service_name: service.name,
-    price_lei: service.price_lei,
-    duration_min: service.duration_min,
-    scheduled_at: scheduledAt,
-    notes,
-  });
+  const studio = service.studios as unknown as JoinedStudio;
 
-  if (insErr) {
+  const { data: booking, error: insErr } = await supabase
+    .from('bookings')
+    .insert({
+      studio_id: service.studio_id,
+      service_id: service.id,
+      client_id: user.id,
+      service_name: service.name,
+      price_lei: service.price_lei,
+      duration_min: service.duration_min,
+      scheduled_at: scheduledAt,
+      notes,
+    })
+    .select('id')
+    .single();
+
+  if (insErr || !booking) {
     console.error('createBookingAction: insert failed', insErr);
     redirect(`/${locale}/checkout?err=db`);
   }
 
+  // Paid path: charge the client and split the platform fee to us.
+  let checkoutUrl: string | null = null;
+  const canCharge =
+    isStripeConfigured() && studio.stripe_charges_enabled && !!studio.stripe_account_id;
+
+  if (canCharge) {
+    const host = (await headers()).get('host') ?? 'localhost:3000';
+    const base = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${host}`;
+    const amountMinor = toMinor(service.price_lei);
+    const fee = applicationFeeMinor(amountMinor);
+
+    try {
+      const stripe = getStripe();
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: STRIPE_CURRENCY,
+              product_data: { name: service.name },
+              unit_amount: amountMinor,
+            },
+          },
+        ],
+        payment_intent_data: {
+          application_fee_amount: fee,
+          transfer_data: { destination: studio.stripe_account_id as string },
+        },
+        success_url: `${base}/${locale}/account?booked=1&paid=1`,
+        cancel_url: `${base}/${locale}/studio/${studio.slug}/book`,
+        metadata: {
+          booking_id: booking.id as string,
+          studio_id: service.studio_id as string,
+          client_id: user.id,
+          application_fee: String(fee),
+        },
+      });
+      checkoutUrl = session.url;
+    } catch (err) {
+      // Payment couldn't start — keep the pending booking so it isn't lost.
+      console.error('createBookingAction: stripe session failed', err);
+    }
+  }
+
+  if (checkoutUrl) redirect(checkoutUrl);
   redirect(`/${locale}/account?booked=1`);
 }

@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Globe,
   EyeOff,
+  CreditCard,
 } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
@@ -127,6 +128,7 @@ export default async function ProviderHome({
               <ManageCard href="/provider/site" icon={<LayoutTemplate className="size-5" />} title="Mini-site" hint="Design your page" />
               <ManageCard href="/provider/availability" icon={<Clock className="size-5" />} title="Hours" hint="Your weekly schedule" />
               <ManageCard href="/provider/bookings" icon={<CalendarDays className="size-5" />} title="Bookings" hint="Requests & schedule" />
+              <ManageCard href="/provider/payments" icon={<CreditCard className="size-5" />} title="Payments" hint="Payouts & plan" />
             </div>
           </section>
 

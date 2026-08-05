@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server';
 
 import { AppTopBar } from '@/components/app/app-top-bar';
 import { createClient } from '@/lib/supabase/server';
+import { isStripeConfigured } from '@/lib/stripe/config';
 import { CheckoutClient } from './checkout-client';
 
 export const dynamic = 'force-dynamic';
@@ -25,15 +26,19 @@ export default async function CheckoutPage({
   // Single query that validates the service belongs to a published studio with this slug.
   const { data: bundle } = await supabase
     .from('services')
-    .select('id, name, duration_min, price_lei, studios!inner(slug, name, is_published)')
+    .select(
+      'id, name, duration_min, price_lei, studios!inner(slug, name, is_published, stripe_charges_enabled)',
+    )
     .eq('id', serviceId)
     .eq('studios.slug', studioSlug)
     .eq('studios.is_published', true)
     .maybeSingle();
 
   const studio = bundle?.studios as
-    | { slug: string; name: string; is_published: boolean }
+    | { slug: string; name: string; is_published: boolean; stripe_charges_enabled: boolean }
     | undefined;
+
+  const payEnabled = isStripeConfigured() && Boolean(studio?.stripe_charges_enabled);
 
   return (
     <div className="min-h-dvh pb-12">
@@ -51,6 +56,7 @@ export default async function CheckoutPage({
         date={sp.date ?? ''}
         time={sp.time ?? ''}
         locale={locale}
+        payEnabled={payEnabled}
       />
     </div>
   );
