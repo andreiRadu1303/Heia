@@ -1,11 +1,11 @@
 import { setRequestLocale } from 'next-intl/server';
 
-import { createClient } from '@/lib/supabase/server';
 import { studioById, MY_STUDIO_ID } from '@/lib/app-mock-data';
+import { getMyStudio } from '@/lib/provider-studio';
+import { getPublicStudioBySlug } from '@/lib/public-studio';
 import { type SiteConfig } from '@/lib/site-config';
 import { SiteBuilder } from './site-builder';
 
-// Auth-gated by the provider layout; keep dynamic (reads the user's studio).
 export const dynamic = 'force-dynamic';
 
 function isSiteConfig(value: unknown): value is SiteConfig {
@@ -25,25 +25,18 @@ export default async function ProviderSitePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // Load the signed-in expert's saved config from their own studio row.
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const myStudio = await getMyStudio();
+  const initialConfig = isSiteConfig(myStudio?.site_config)
+    ? (myStudio!.site_config as SiteConfig)
+    : null;
 
-  let initialConfig: SiteConfig | null = null;
-  if (user) {
-    const { data } = await supabase
-      .from('studios')
-      .select('site_config')
-      .eq('provider_id', user.id)
-      .maybeSingle();
-    if (isSiteConfig(data?.site_config)) initialConfig = data!.site_config as SiteConfig;
+  // Preview the expert's OWN studio content so it's really "their" page.
+  // Fall back to a demo studio if we can't resolve it (e.g. no studio yet).
+  let studio = studioById(MY_STUDIO_ID)!;
+  if (myStudio) {
+    const real = await getPublicStudioBySlug(myStudio.slug);
+    if (real) studio = real;
   }
-
-  // Preview uses representative content (the demo studio) until content
-  // editing is wired; the design/config being saved is the expert's own.
-  const studio = studioById(MY_STUDIO_ID)!;
 
   return <SiteBuilder studio={studio} locale={locale} initialConfig={initialConfig} />;
 }
