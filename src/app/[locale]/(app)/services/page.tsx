@@ -18,7 +18,7 @@ export default async function ServicesPage({
 
   return (
     <div className="min-h-dvh pb-16">
-      <AppTopBar title="Choose a service" backHref="/" step="Step 1 of 3" />
+      <AppTopBar title="Choose a service" backHref="/" step="Step 1 of 2" />
 
       <main className="container pt-8">
         <h1 className="text-3xl font-medium leading-tight tracking-tight sm:text-4xl">

@@ -29,19 +29,26 @@ export default async function StudioPage({
 
   return (
     <div className="min-h-dvh pb-24">
-      <AppTopBar
-        title={studio.name}
-        backHref={`/discover?category=${studio.categoryId}`}
-        step="Step 2 of 3"
-      />
+      <AppTopBar title={studio.name} backHref={`/discover?category=${studio.categoryId}`} />
 
       {/* Hero */}
       <div className="relative h-64 w-full overflow-hidden sm:h-80">
-        <img
-          src={studio.heroUrl || img.hero(studio.heroSeed)}
-          alt=""
-          className="size-full object-cover"
-        />
+        {studio.heroUrl || studio.heroSeed ? (
+          <img
+            src={studio.heroUrl || img.hero(studio.heroSeed)}
+            alt=""
+            className="size-full object-cover"
+          />
+        ) : (
+          <div
+            className="size-full"
+            style={{
+              background:
+                'linear-gradient(160deg, hsl(var(--muted)) 0%, hsl(var(--secondary)) 55%, hsl(var(--accent) / 0.3) 100%)',
+            }}
+            aria-hidden
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent" />
         <div className="absolute bottom-4 left-0 right-0 px-5">
           <div className="flex items-center gap-2 text-xs font-medium text-white/85">

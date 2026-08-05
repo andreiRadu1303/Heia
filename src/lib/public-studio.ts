@@ -89,8 +89,10 @@ export async function getPublicStudioBySlug(slug: string): Promise<Studio | null
     services,
     reviews: [],
     gallerySeeds: studio.gallery_seeds ?? [],
-    avatarSeed: studio.avatar_seed ?? studio.slug,
-    heroSeed: studio.hero_seed ?? studio.slug,
+    // Empty (not slug) when there's no curated seed, so the UI shows a branded
+    // gradient placeholder instead of a random stock photo.
+    avatarSeed: studio.avatar_seed ?? '',
+    heroSeed: studio.hero_seed ?? '',
     heroUrl: studio.cover_url,
     avatarUrl: studio.avatar_url,
     galleryUrls: studio.gallery_urls ?? [],

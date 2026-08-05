@@ -92,11 +92,20 @@ export default async function AccountPage({
                     href={studio ? `/studio/${studio.slug}` : '/dashboard'}
                     className="flex items-center gap-3 rounded-3xl bg-card p-3 ring-1 ring-border"
                   >
-                    <img
-                      src={img.square(studio?.hero_seed ?? 'heia-default')}
-                      alt=""
-                      className="size-16 shrink-0 rounded-2xl object-cover"
-                    />
+                    {studio?.hero_seed ? (
+                      <img
+                        src={img.square(studio.hero_seed)}
+                        alt=""
+                        className="size-16 shrink-0 rounded-2xl object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent/30 to-secondary text-lg font-medium text-foreground/60"
+                        aria-hidden
+                      >
+                        {(studio?.name ?? 'S').charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-medium">{studio?.name ?? 'Studio'}</div>
                       <div className="truncate text-sm text-muted-foreground">{b.service_name}</div>
