@@ -75,11 +75,21 @@ export function DiscoverClient({
                   isFocused ? 'bg-accent/10 ring-accent/40' : 'bg-background ring-border',
                 )}
               >
-                <img
-                  src={img.square(s.heroSeed)}
-                  alt=""
-                  className="size-16 shrink-0 rounded-2xl object-cover"
-                />
+                {s.heroUrl || s.heroSeed ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={s.heroUrl || img.square(s.heroSeed)}
+                    alt=""
+                    className="size-16 shrink-0 rounded-2xl object-cover"
+                  />
+                ) : (
+                  <div
+                    className="grid size-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent/30 to-secondary text-lg font-medium text-foreground/60"
+                    aria-hidden
+                  >
+                    {s.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{s.name}</div>
                   <div className="truncate text-xs text-muted-foreground">{s.tagline}</div>
@@ -91,9 +101,11 @@ export function DiscoverClient({
                     <span>{s.distanceKm === 0 ? 'Mobile' : `${s.distanceKm} km`}</span>
                   </div>
                 </div>
-                <div className="rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-foreground">
-                  {formatLei(s.priceFromLei)}+
-                </div>
+                {s.priceFromLei > 0 ? (
+                  <div className="rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-foreground">
+                    {formatLei(s.priceFromLei)}+
+                  </div>
+                ) : null}
               </Link>
             );
           })}
