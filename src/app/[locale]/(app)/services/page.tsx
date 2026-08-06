@@ -2,7 +2,10 @@ import { setRequestLocale } from 'next-intl/server';
 
 import { Link } from '@/i18n/navigation';
 import { AppTopBar } from '@/components/app/app-top-bar';
-import { CATEGORIES, STUDIOS } from '@/lib/app-mock-data';
+import { CATEGORIES } from '@/lib/app-mock-data';
+import { getPublishedCategoryCounts } from '@/lib/discover-server';
+
+export const dynamic = 'force-dynamic';
 
 export default async function ServicesPage({
   params,
@@ -12,9 +15,8 @@ export default async function ServicesPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  function countFor(categoryId: string) {
-    return STUDIOS.filter((s) => s.categoryId === categoryId).length;
-  }
+  const counts = await getPublishedCategoryCounts();
+  const countFor = (categoryId: string) => counts[categoryId] ?? 0;
 
   return (
     <div className="min-h-dvh pb-16">

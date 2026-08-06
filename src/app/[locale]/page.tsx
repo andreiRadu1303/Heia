@@ -5,7 +5,8 @@ import { Link } from '@/i18n/navigation';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { Button } from '@/components/ui/button';
-import { STUDIOS, img, formatLei } from '@/lib/app-mock-data';
+import { img, formatLei } from '@/lib/app-mock-data';
+import { getPublishedStudios } from '@/lib/discover-server';
 
 export default async function LandingPage({
   params,
@@ -15,7 +16,7 @@ export default async function LandingPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const featured = STUDIOS.slice(0, 4);
+  const featured = await getPublishedStudios({ limit: 4 });
 
   return (
     <div className="relative flex min-h-dvh flex-col overflow-hidden bg-background text-foreground">
@@ -229,7 +230,7 @@ export default async function LandingPage({
               >
                 <div className="aspect-[4/5] overflow-hidden">
                   <img
-                    src={img.square(s.heroSeed)}
+                    src={s.heroUrl || img.square(s.heroSeed || s.id)}
                     alt=""
                     className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

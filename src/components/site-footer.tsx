@@ -12,10 +12,10 @@ export async function SiteFooter() {
           <div className="text-xs uppercase tracking-widest">{t('phase')}</div>
         </div>
         <div className="flex gap-4">
-          <Link href="/" className="hover:text-foreground">
+          <Link href="/terms" className="hover:text-foreground">
             {t('terms')}
           </Link>
-          <Link href="/" className="hover:text-foreground">
+          <Link href="/privacy" className="hover:text-foreground">
             {t('privacy')}
           </Link>
         </div>

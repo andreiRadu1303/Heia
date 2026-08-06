@@ -1,8 +1,11 @@
 import { setRequestLocale } from 'next-intl/server';
 
 import { AppTopBar } from '@/components/app/app-top-bar';
-import { CATEGORIES, categoryById, studiosByCategory, studioById } from '@/lib/app-mock-data';
+import { CATEGORIES, categoryById } from '@/lib/app-mock-data';
+import { getPublishedStudios } from '@/lib/discover-server';
 import { DiscoverClient } from './discover-client';
+
+export const dynamic = 'force-dynamic';
 
 export default async function DiscoverPage({
   params,
@@ -16,11 +19,10 @@ export default async function DiscoverPage({
 
   const sp = await searchParams;
 
-  // A `focus` studio implies its category; otherwise use the category param.
-  const focused = sp.focus ? studioById(sp.focus) : undefined;
-  const category =
-    categoryById(focused?.categoryId ?? sp.category ?? '') ?? CATEGORIES[0];
-  const studios = studiosByCategory(category.id);
+  const category = categoryById(sp.category ?? '') ?? CATEGORIES[0];
+  const studios = await getPublishedStudios({ categoryId: category.id });
+  // A `focus` studio (by slug) surfaces first if it's in this category.
+  const focused = sp.focus ? studios.find((s) => s.id === sp.focus) : undefined;
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">

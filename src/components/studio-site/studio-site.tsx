@@ -131,6 +131,15 @@ function Hero({ variant, ctx }: { variant: string; ctx: Ctx }) {
   const { studio } = ctx;
   const category = categoryById(studio.categoryId);
 
+  // Uploaded cover → seed image → branded gradient (no random stock photo).
+  const heroBg = studio.heroUrl || (studio.heroSeed ? img.hero(studio.heroSeed) : null);
+  const heroStyle: React.CSSProperties = heroBg
+    ? { backgroundImage: `url('${heroBg}')` }
+    : {
+        background:
+          'linear-gradient(160deg, var(--site-surface) 0%, color-mix(in srgb, var(--site-accent) 28%, var(--site-surface)) 100%)',
+      };
+
   if (variant === 'minimal') {
     return (
       <section className="px-6 py-[var(--site-section-y)] sm:px-10">
@@ -161,7 +170,7 @@ function Hero({ variant, ctx }: { variant: string; ctx: Ctx }) {
       <section className="grid sm:grid-cols-2">
         <div
           className="min-h-[280px] bg-cover bg-center sm:min-h-[520px]"
-          style={{ backgroundImage: `url('${img.hero(studio.heroSeed)}')` }}
+          style={heroStyle}
           aria-hidden
         />
         <div className="flex flex-col justify-center bg-[var(--site-surface)] px-6 py-[var(--site-section-y)] sm:px-10">
@@ -186,10 +195,7 @@ function Hero({ variant, ctx }: { variant: string; ctx: Ctx }) {
 
   // variant === 'photo' (default)
   return (
-    <section
-      className="relative flex min-h-[70vh] items-end bg-cover bg-center"
-      style={{ backgroundImage: `url('${img.hero(studio.heroSeed)}')` }}
-    >
+    <section className="relative flex min-h-[70vh] items-end bg-cover bg-center" style={heroStyle}>
       <div
         className="absolute inset-0"
         style={{
