@@ -1,4 +1,4 @@
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ArrowRight, MapPin, CalendarCheck, Search, Star } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';
@@ -15,6 +15,7 @@ export default async function LandingPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations('Landing');
 
   const featured = await getPublishedStudios({ limit: 4 });
 
@@ -45,7 +46,7 @@ export default async function LandingPage({
             <div className="container">
               <div className="inline-flex items-center gap-2 rounded-full bg-background/50 px-4 py-1.5 text-xs font-medium text-foreground backdrop-blur-md ring-1 ring-foreground/15">
                 <span className="inline-block size-1.5 rounded-full bg-accent" aria-hidden />
-                Selfcare, your way · România
+                {t('kicker')}
               </div>
             </div>
           </div>
@@ -63,19 +64,18 @@ export default async function LandingPage({
                 className="mt-3 max-w-3xl text-4xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl"
                 style={{ textShadow: '0 2px 24px rgb(0 0 0 / 0.55)' }}
               >
-                Find your people for whatever selfcare means to you.
+                {t('heroTitle')}
               </h1>
               <p
                 className="mt-5 max-w-xl text-base leading-relaxed text-foreground/85 sm:text-lg"
                 style={{ textShadow: '0 1px 16px rgb(0 0 0 / 0.5)' }}
               >
-                Hair, tattoo, massage, nails and more — discover specialists near you, see how they
-                work, and book in a few taps. Calm, considered, no pressure.
+                {t('heroBody')}
               </p>
               <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
                 <Button asChild size="lg" className="h-12 gap-2 px-6">
                   <Link href="/services">
-                    Get started <ArrowRight className="size-4" />
+                    {t('getStarted')} <ArrowRight className="size-4" />
                   </Link>
                 </Button>
                 <Button
@@ -84,7 +84,7 @@ export default async function LandingPage({
                   variant="outline"
                   className="h-12 border-foreground/30 bg-background/30 px-6 text-foreground backdrop-blur-md hover:bg-background/50"
                 >
-                  <Link href="#how">How it works</Link>
+                  <Link href="#how">{t('howItWorks')}</Link>
                 </Button>
               </div>
             </div>
@@ -98,30 +98,30 @@ export default async function LandingPage({
           <div className="container">
             <div className="mb-10 text-center">
               <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
-                How it works
+                {t('howItWorks')}
               </div>
               <h2 className="mt-3 text-2xl font-medium tracking-tight sm:text-3xl">
-                Three taps to booked.
+                {t('howTitle')}
               </h2>
             </div>
             <div className="grid gap-6 sm:grid-cols-3">
               <Step
                 icon={<Search className="size-5" />}
                 n="01"
-                title="Choose a service"
-                body="Pick what you’re in the mood for — from a fresh cut to a deep-tissue massage."
+                title={t('step1Title')}
+                body={t('step1Body')}
               />
               <Step
                 icon={<MapPin className="size-5" />}
                 n="02"
-                title="Discover nearby"
-                body="See specialists on a map, browse their work, read real reviews."
+                title={t('step2Title')}
+                body={t('step2Body')}
               />
               <Step
                 icon={<CalendarCheck className="size-5" />}
                 n="03"
-                title="Book in seconds"
-                body="Pick a time, confirm, pay. One place — no chasing DMs."
+                title={t('step3Title')}
+                body={t('step3Body')}
               />
             </div>
           </div>
@@ -145,18 +145,17 @@ export default async function LandingPage({
             <div className="flex items-center bg-background py-16 lg:col-span-2 lg:py-24">
               <div className="container max-w-md">
                 <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
-                  Craft, not gimmick
+                  {t('craftKicker')}
                 </div>
                 <h2 className="mt-3 text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
-                  Specialists who care about the small things.
+                  {t('craftTitle')}
                 </h2>
                 <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-                  Every profile on Heia is a person who shows up for their craft. You see the work
-                  before you see the price.
+                  {t('craftBody')}
                 </p>
                 <Button asChild size="lg" variant="secondary" className="mt-8 h-12 gap-2 px-6">
                   <Link href="/services">
-                    Browse specialists <ArrowRight className="size-4" />
+                    {t('browseSpecialists')} <ArrowRight className="size-4" />
                   </Link>
                 </Button>
               </div>
@@ -181,20 +180,19 @@ export default async function LandingPage({
             <div className="container relative z-10">
               <div className="max-w-xl">
                 <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
-                  For everyone
+                  {t('everyoneKicker')}
                 </div>
                 <h2
                   className="mt-3 text-3xl font-medium leading-tight tracking-tight sm:text-4xl md:text-5xl"
                   style={{ textShadow: '0 2px 20px rgb(0 0 0 / 0.55)' }}
                 >
-                  All self-care services. Beard, skin, hair, grooming.
+                  {t('everyoneTitle')}
                 </h2>
                 <p
                   className="mt-5 text-base leading-relaxed text-foreground/90 sm:text-lg"
                   style={{ textShadow: '0 1px 16px rgb(0 0 0 / 0.5)' }}
                 >
-                  Wellbeing doesn’t look the same on everyone. Heia is built for all of it — every
-                  age, every gender, every kind of ritual.
+                  {t('everyoneBody')}
                 </p>
               </div>
             </div>
@@ -208,17 +206,17 @@ export default async function LandingPage({
           <div className="mb-8 flex items-baseline justify-between">
             <div>
               <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
-                Featured
+                {t('featuredKicker')}
               </div>
               <h2 className="mt-2 text-2xl font-medium tracking-tight sm:text-3xl">
-                People worth a visit this week.
+                {t('featuredTitle')}
               </h2>
             </div>
             <Link
               href="/services"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
             >
-              See all
+              {t('seeAll')}
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -262,14 +260,14 @@ export default async function LandingPage({
               Heia
             </div>
             <h2 className="mx-auto mt-3 max-w-xl text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
-              Your time, your ritual. Whenever you need it.
+              {t('ctaTitle')}
             </h2>
             <p className="mx-auto mt-3 max-w-md text-sm text-foreground/70">
-              Join Heia and find the people who get your vibe.
+              {t('ctaBody')}
             </p>
             <Button asChild size="lg" className="mt-8 h-12 gap-2 px-6">
               <Link href="/services">
-                Get started <ArrowRight className="size-4" />
+                {t('getStarted')} <ArrowRight className="size-4" />
               </Link>
             </Button>
           </div>

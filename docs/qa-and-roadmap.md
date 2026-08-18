@@ -39,7 +39,7 @@ refinements, and proposed new features. Last full sweep: production
 
 | # | Sev | Bug | Suggested fix |
 |---|-----|-----|---------------|
-| B5 | Medium | **Localization gap** — landing + app-loop copy is hardcoded English; only header/auth/nav are translated. On `/ro` the marketing hero shows English. Significant for a Romania-first launch. (Absorbs B8: the booking day picker's mixed EN/RO resolves once the loop is localized.) | Move all user-facing strings into `messages/ro.json` + `en.json`; translate the landing and the (app) loop. |
+| B5 | Medium | **Localization gap** — app-loop copy is hardcoded English; only header/auth/nav were translated. On `/ro` the marketing hero showed English. Significant for a Romania-first launch. (Absorbs B8.) **In progress:** the **landing page is now fully Romanian** (`Landing` namespace in `messages/*`). Remaining: the client loop (services, discover, studio, book, checkout, account) and the provider area. | Continue moving user-facing strings into `messages/ro.json` + `en.json` per page. |
 | B6 | Low | **Brittle column coupling** — `getMyStudio()` (and other reads) select every column, so a single missing migration breaks the whole provider area (root of B1). Mitigated now that 008/009 are applied. | Select only needed columns per surface, or add a startup migration check / health probe. |
 
 ---
