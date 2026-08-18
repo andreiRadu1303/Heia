@@ -7,8 +7,7 @@ import { useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { formatLei } from '@/lib/app-mock-data';
-
-const TIMES = ['09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '18:00'];
+import { getSlotsAction } from './actions';
 
 export interface BookingService {
   id: string;
@@ -45,6 +44,31 @@ export function BookingClient({
 
   const service = services.find((s) => s.id === serviceId);
   const canContinue = Boolean(service) && time != null;
+
+  // Real slots from the provider's hours, minus what's already booked.
+  const [slots, setSlots] = React.useState<string[]>([]);
+  const [loadingSlots, setLoadingSlots] = React.useState(false);
+  const dateISO = React.useMemo(
+    () => days[dateIdx]?.toISOString().slice(0, 10) ?? '',
+    [days, dateIdx],
+  );
+
+  React.useEffect(() => {
+    if (!serviceId || !dateISO) return;
+    let cancelled = false;
+    setLoadingSlots(true);
+    setTime(null);
+    getSlotsAction(studioSlug, dateISO, serviceId)
+      .then((result) => {
+        if (!cancelled) setSlots(result);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingSlots(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [studioSlug, dateISO, serviceId]);
 
   function handleContinue() {
     if (!canContinue || !service) return;
@@ -146,26 +170,38 @@ export function BookingClient({
       {/* Time */}
       <section>
         <h2 className="mb-3 text-lg font-medium tracking-tight">Pick a time</h2>
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-          {TIMES.map((t) => {
-            const selected = t === time;
-            return (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTime(t)}
-                className={cn(
-                  'rounded-2xl border py-3 text-sm font-medium transition-colors',
-                  selected
-                    ? 'border-foreground bg-foreground text-background'
-                    : 'border-border bg-card hover:bg-secondary/30',
-                )}
-              >
-                {t}
-              </button>
-            );
-          })}
-        </div>
+        {loadingSlots ? (
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-12 animate-pulse rounded-2xl bg-card" />
+            ))}
+          </div>
+        ) : slots.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
+            No free times on this day. Try another date.
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            {slots.map((t) => {
+              const selected = t === time;
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTime(t)}
+                  className={cn(
+                    'rounded-2xl border py-3 text-sm font-medium transition-colors',
+                    selected
+                      ? 'border-foreground bg-foreground text-background'
+                      : 'border-border bg-card hover:bg-secondary/30',
+                  )}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Sticky continue */}

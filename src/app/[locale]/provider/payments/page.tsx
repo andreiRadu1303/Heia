@@ -1,8 +1,9 @@
 import { setRequestLocale } from 'next-intl/server';
-import { CreditCard, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { CreditCard, CheckCircle2, AlertCircle, Sparkles, Receipt } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { getMyStudio } from '@/lib/provider-studio';
+import { getStudioEarnings } from '@/lib/payments-server';
 import { getStripe } from '@/lib/stripe/client';
 import {
   isStripeConfigured,
@@ -82,6 +83,9 @@ export default async function ProviderPaymentsPage({
   const configured = isStripeConfigured();
   const plans = getPlans();
   const subActive = profile?.subscription_status === 'active';
+  const earnings = studio ? await getStudioEarnings(studio.id) : null;
+  const money = (minor: number, currency: string) =>
+    `${(minor / 100).toFixed(2)} ${currency.toUpperCase()}`;
 
   return (
     <main className="container max-w-2xl space-y-6 pt-8">
@@ -182,6 +186,68 @@ export default async function ProviderPaymentsPage({
           )}
         </div>
       </section>
+
+      {/* Earnings / transaction log */}
+      {earnings ? (
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2">
+            <Receipt className="size-5 text-accent" />
+            <h2 className="text-lg font-medium">Earnings</h2>
+          </div>
+
+          {earnings.count === 0 ? (
+            <p className="mt-2 text-sm text-muted-foreground">
+              No payments yet. Card payments for your bookings will show up here.
+            </p>
+          ) : (
+            <>
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                <div className="rounded-xl bg-background p-3">
+                  <div className="text-xs text-muted-foreground">Collected</div>
+                  <div className="mt-1 font-medium">
+                    {money(earnings.grossMinor, earnings.currency)}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-background p-3">
+                  <div className="text-xs text-muted-foreground">Heia fee</div>
+                  <div className="mt-1 font-medium">
+                    −{money(earnings.feeMinor, earnings.currency)}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-background p-3">
+                  <div className="text-xs text-muted-foreground">Your net</div>
+                  <div className="mt-1 font-medium text-accent">
+                    {money(earnings.netMinor, earnings.currency)}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 divide-y divide-border">
+                {earnings.recent.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between gap-3 py-2.5">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">
+                        {p.serviceName ?? 'Booking'}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(p.createdAt).toLocaleDateString(locale)}
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="text-sm font-medium">
+                        {money(p.amountMinor - p.feeMinor, earnings.currency)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        of {money(p.amountMinor, earnings.currency)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+      ) : null}
 
       {/* Subscription plans */}
       <section className="rounded-2xl border border-border bg-card p-5">

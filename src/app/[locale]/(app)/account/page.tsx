@@ -7,6 +7,7 @@ import { AppTopBar } from '@/components/app/app-top-bar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { img, formatBookingDate } from '@/lib/app-mock-data';
+import { reconcilePaidSession } from '@/lib/payments-server';
 import { cn } from '@/lib/utils';
 import { logoutAction } from '../dashboard/actions';
 
@@ -29,11 +30,16 @@ export default async function AccountPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ booked?: string }>;
+  searchParams: Promise<{ booked?: string; paid?: string; session_id?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const sp = await searchParams;
+
+  // Safety net: record the payment ourselves if the webhook hasn't (idempotent).
+  if (sp.session_id) {
+    await reconcilePaidSession(sp.session_id);
+  }
 
   const supabase = await createClient();
   const {

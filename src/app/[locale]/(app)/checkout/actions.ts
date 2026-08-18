@@ -107,7 +107,9 @@ export async function createBookingAction(formData: FormData) {
           application_fee_amount: fee,
           transfer_data: { destination: studio.stripe_account_id as string },
         },
-        success_url: `${base}/${locale}/account?booked=1&paid=1`,
+        // The session id lets the success page reconcile the payment into our
+        // own tables even if the webhook never arrives.
+        success_url: `${base}/${locale}/account?booked=1&paid=1&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${base}/${locale}/studio/${studio.slug}/book`,
         metadata: {
           booking_id: booking.id as string,
