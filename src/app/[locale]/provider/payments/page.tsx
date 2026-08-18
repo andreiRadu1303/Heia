@@ -47,7 +47,19 @@ export default async function ProviderPaymentsPage({
         studio = { ...studio, stripe_charges_enabled: enabled };
       }
     } catch (e) {
-      console.error('Could not refresh Stripe account status', e);
+      // If Stripe doesn't know this account (e.g. it was created with keys from
+      // a different mode — live vs test), clear it so the expert can reconnect
+      // cleanly instead of being stuck against a stale id.
+      const message = e instanceof Error ? e.message : '';
+      if (/No such account|does not exist|similar object exists in/i.test(message)) {
+        await supabase
+          .from('studios')
+          .update({ stripe_account_id: null, stripe_charges_enabled: false })
+          .eq('id', studio.id);
+        studio = { ...studio, stripe_account_id: null, stripe_charges_enabled: false };
+      } else {
+        console.error('Could not refresh Stripe account status', e);
+      }
     }
   }
 
