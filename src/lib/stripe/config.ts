@@ -20,6 +20,15 @@ export function isStripeConfigured(): boolean {
   return Boolean(process.env.STRIPE_SECRET_KEY);
 }
 
+/**
+ * Whether Stripe is running against test keys. Derived from the key prefix, so
+ * it never exposes the secret itself — just lets the UI warn loudly when the
+ * app is wired to LIVE keys (i.e. real money) while you're still testing.
+ */
+export function isStripeTestMode(): boolean {
+  return (process.env.STRIPE_SECRET_KEY ?? '').startsWith('sk_test_');
+}
+
 /** Whole currency units → minor units (lei → bani). */
 export function toMinor(amount: number): number {
   return Math.round(amount * 100);

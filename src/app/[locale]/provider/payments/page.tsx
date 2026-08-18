@@ -4,7 +4,12 @@ import { CreditCard, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getMyStudio } from '@/lib/provider-studio';
 import { getStripe } from '@/lib/stripe/client';
-import { isStripeConfigured, feePercentLabel, getPlans } from '@/lib/stripe/config';
+import {
+  isStripeConfigured,
+  isStripeTestMode,
+  feePercentLabel,
+  getPlans,
+} from '@/lib/stripe/config';
 import {
   startConnectOnboarding,
   openConnectDashboard,
@@ -84,6 +89,20 @@ export default async function ProviderPaymentsPage({
         <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Payments</h1>
         <p className="mt-2 text-muted-foreground">Get paid for bookings and manage your plan.</p>
       </header>
+
+      {configured ? (
+        <div
+          className={
+            isStripeTestMode()
+              ? 'rounded-xl border border-border bg-muted/40 px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground'
+              : 'rounded-xl border border-destructive/50 bg-destructive/10 px-3 py-2 font-mono text-xs uppercase tracking-widest text-destructive'
+          }
+        >
+          {isStripeTestMode()
+            ? 'Stripe · test mode — no real money'
+            : '⚠ Stripe · LIVE mode — real cards will be charged'}
+        </div>
+      ) : null}
 
       {err ? (
         <div className="flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
