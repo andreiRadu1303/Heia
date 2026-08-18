@@ -15,10 +15,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProviderPaymentsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ err?: string; connected?: string; subscribed?: string }>;
 }) {
   const { locale } = await params;
+  const { err } = await searchParams;
   setRequestLocale(locale);
 
   const studio = await getMyStudio();
@@ -44,6 +47,17 @@ export default async function ProviderPaymentsPage({
         <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Payments</h1>
         <p className="mt-2 text-muted-foreground">Get paid for bookings and manage your plan.</p>
       </header>
+
+      {err ? (
+        <div className="flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          <AlertCircle className="mt-0.5 size-4 shrink-0" />
+          <span>
+            <strong>Stripe couldn’t start onboarding.</strong>
+            <br />
+            {err}
+          </span>
+        </div>
+      ) : null}
 
       {!configured ? (
         <div className="flex items-start gap-3 rounded-2xl border border-dashed border-border bg-muted/40 p-4 text-sm text-muted-foreground">

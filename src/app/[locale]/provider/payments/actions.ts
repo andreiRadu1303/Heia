@@ -28,25 +28,48 @@ export async function startConnectOnboarding(formData: FormData) {
     .maybeSingle();
   if (!studio) redirect(`/${locale}/provider`);
 
-  const stripe = getStripe();
-  let accountId = studio.stripe_account_id as string | null;
-  if (!accountId) {
-    const account = await stripe.accounts.create({
-      type: 'express',
-      metadata: { studio_id: studio.id as string, user_id: user.id },
+  // Build the onboarding link, capturing any Stripe error so the UI can show
+  // it instead of a blank 500. `redirect()` must run outside the try/catch —
+  // Next.js implements it by throwing.
+  let onboardingUrl: string | null = null;
+  let failure = '';
+
+  try {
+    const stripe = getStripe();
+    let accountId = studio.stripe_account_id as string | null;
+    if (!accountId) {
+      // Controller properties (not the legacy `type: 'express'`), which is what
+      // Stripe recommends for new platforms and matches our destination-charge
+      // model: the platform pays Stripe's fees and collects an application fee,
+      // the platform owns loss liability, and the expert gets an Express-style
+      // dashboard for payouts.
+      const account = await stripe.accounts.create({
+        controller: {
+          fees: { payer: 'application' },
+          losses: { payments: 'application' },
+          stripe_dashboard: { type: 'express' },
+        },
+        metadata: { studio_id: studio.id as string, user_id: user.id },
+      });
+      accountId = account.id;
+      await supabase.from('studios').update({ stripe_account_id: accountId }).eq('id', studio.id);
+    }
+
+    const base = await siteOrigin();
+    const link = await stripe.accountLinks.create({
+      account: accountId,
+      refresh_url: `${base}/${locale}/provider/payments`,
+      return_url: `${base}/${locale}/provider/payments?connected=1`,
+      type: 'account_onboarding',
     });
-    accountId = account.id;
-    await supabase.from('studios').update({ stripe_account_id: accountId }).eq('id', studio.id);
+    onboardingUrl = link.url;
+  } catch (err) {
+    console.error('startConnectOnboarding failed', err);
+    failure = err instanceof Error ? err.message : 'Unknown Stripe error';
   }
 
-  const base = await siteOrigin();
-  const link = await stripe.accountLinks.create({
-    account: accountId,
-    refresh_url: `${base}/${locale}/provider/payments`,
-    return_url: `${base}/${locale}/provider/payments?connected=1`,
-    type: 'account_onboarding',
-  });
-  redirect(link.url);
+  if (onboardingUrl) redirect(onboardingUrl);
+  redirect(`/${locale}/provider/payments?err=${encodeURIComponent(failure.slice(0, 300))}`);
 }
 
 /** Open the expert's Stripe Express dashboard (view payouts). */
