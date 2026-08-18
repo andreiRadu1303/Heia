@@ -3,6 +3,7 @@ import { CreditCard, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { getMyStudio } from '@/lib/provider-studio';
+import { getStripe } from '@/lib/stripe/client';
 import { isStripeConfigured, feePercentLabel, getPlans } from '@/lib/stripe/config';
 import {
   startConnectOnboarding,
@@ -24,8 +25,32 @@ export default async function ProviderPaymentsPage({
   const { err } = await searchParams;
   setRequestLocale(locale);
 
-  const studio = await getMyStudio();
+  let studio = await getMyStudio();
   const supabase = await createClient();
+
+  // Sync payout status straight from Stripe rather than relying only on the
+  // `account.updated` webhook (which can be delayed, misconfigured, or missed).
+  let pendingRequirements: string[] = [];
+  if (studio?.stripe_account_id && isStripeConfigured()) {
+    try {
+      const account = await getStripe().accounts.retrieve(studio.stripe_account_id);
+      const enabled = Boolean(account.charges_enabled);
+      pendingRequirements = [
+        ...(account.requirements?.currently_due ?? []),
+        ...(account.requirements?.past_due ?? []),
+      ];
+      if (enabled !== studio.stripe_charges_enabled) {
+        await supabase
+          .from('studios')
+          .update({ stripe_charges_enabled: enabled })
+          .eq('id', studio.id);
+        studio = { ...studio, stripe_charges_enabled: enabled };
+      }
+    } catch (e) {
+      console.error('Could not refresh Stripe account status', e);
+    }
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -100,17 +125,29 @@ export default async function ProviderPaymentsPage({
               </form>
             </div>
           ) : (
-            <form action={startConnectOnboarding}>
-              <input type="hidden" name="locale" value={locale} />
-              <button
-                type="submit"
-                disabled={!configured}
-                className="inline-flex h-11 items-center gap-2 rounded-lg bg-foreground px-5 text-sm font-medium text-background disabled:opacity-50"
-              >
-                <CreditCard className="size-4" />
-                {studio?.stripe_account_id ? 'Finish payout setup' : 'Connect payouts'}
-              </button>
-            </form>
+            <div className="space-y-3">
+              {studio?.stripe_account_id && pendingRequirements.length > 0 ? (
+                <div className="rounded-xl border border-border bg-background p-3 text-xs text-muted-foreground">
+                  <div className="font-medium text-foreground">Stripe still needs:</div>
+                  <ul className="mt-1 list-inside list-disc">
+                    {pendingRequirements.slice(0, 6).map((r) => (
+                      <li key={r}>{r.replace(/_/g, ' ').replace(/\./g, ' → ')}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              <form action={startConnectOnboarding}>
+                <input type="hidden" name="locale" value={locale} />
+                <button
+                  type="submit"
+                  disabled={!configured}
+                  className="inline-flex h-11 items-center gap-2 rounded-lg bg-foreground px-5 text-sm font-medium text-background disabled:opacity-50"
+                >
+                  <CreditCard className="size-4" />
+                  {studio?.stripe_account_id ? 'Finish payout setup' : 'Connect payouts'}
+                </button>
+              </form>
+            </div>
           )}
         </div>
       </section>
