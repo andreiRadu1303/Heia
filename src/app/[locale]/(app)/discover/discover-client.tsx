@@ -58,12 +58,29 @@ export function DiscoverClient({
           <div className="flex flex-col items-center gap-2 py-3">
             <div className="h-1 w-12 rounded-full bg-foreground/30" aria-hidden />
             <div className="text-xs font-medium text-muted-foreground">
-              {ordered.length} nearby · drag up for more
+              {ordered.length === 0
+                ? 'No specialists here yet'
+                : `${ordered.length} nearby · drag up for more`}
             </div>
           </div>
         }
       >
         <div className="space-y-3 px-4 pb-10">
+          {ordered.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-border bg-card/60 p-6 text-center">
+              <div className="text-base font-medium">We&rsquo;re just getting started here</div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No specialists in this category yet. Heia is new — we&rsquo;re adding people
+                carefully rather than filling the map with everyone.
+              </p>
+              <Link
+                href="/services"
+                className="mt-4 inline-flex items-center rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-secondary"
+              >
+                Browse other services
+              </Link>
+            </div>
+          ) : null}
           {ordered.map((s) => {
             const isFocused = focusId === s.id;
             return (

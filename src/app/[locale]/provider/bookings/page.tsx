@@ -5,7 +5,12 @@ import { Check, X, CheckCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { img, formatLei, formatBookingDate } from '@/lib/app-mock-data';
 import { cn } from '@/lib/utils';
-import { acceptBookingAction, declineBookingAction, completeBookingAction } from './actions';
+import {
+  acceptBookingAction,
+  declineBookingAction,
+  completeBookingAction,
+  cancelBookingAction,
+} from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -212,16 +217,28 @@ function BookingCard({
       ) : null}
 
       {completable ? (
-        <form action={completeBookingAction} className="mt-3">
-          <input type="hidden" name="locale" value={locale} />
-          <input type="hidden" name="bookingId" value={booking.id} />
-          <button
-            type="submit"
-            className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-full border border-border text-sm font-medium hover:bg-secondary"
-          >
-            <CheckCheck className="size-4" /> Mark completed
-          </button>
-        </form>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <form action={completeBookingAction}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="bookingId" value={booking.id} />
+            <button
+              type="submit"
+              className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-full border border-border text-sm font-medium hover:bg-secondary"
+            >
+              <CheckCheck className="size-4" /> Mark completed
+            </button>
+          </form>
+          <form action={cancelBookingAction}>
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="bookingId" value={booking.id} />
+            <button
+              type="submit"
+              className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-full border border-border text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-destructive"
+            >
+              <X className="size-4" /> Cancel &amp; refund
+            </button>
+          </form>
+        </div>
       ) : null}
     </div>
   );

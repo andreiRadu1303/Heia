@@ -200,8 +200,10 @@ export default async function LandingPage({
         </section>
 
         {/* =====================================================
-            Featured studios
+            Featured studios — hidden entirely while we have too few,
+            so the page never looks half-empty at launch.
             ===================================================== */}
+        {featured.length >= 2 ? (
         <section className="container py-20">
           <div className="mb-8 flex items-baseline justify-between">
             <div>
@@ -244,6 +246,30 @@ export default async function LandingPage({
             ))}
           </div>
         </section>
+        ) : null}
+
+        {/* =====================================================
+            Founding specialists — recruitment while the supply side
+            is still small. Shown until we have enough experts.
+            ===================================================== */}
+        {featured.length < 6 ? (
+          <section className="container py-20">
+            <div className="rounded-[2rem] border border-border bg-card p-8 sm:p-12">
+              <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
+                {t('foundingKicker')}
+              </div>
+              <h2 className="mt-3 max-w-lg text-2xl font-medium tracking-tight sm:text-3xl">
+                {t('foundingTitle')}
+              </h2>
+              <p className="mt-4 max-w-xl text-muted-foreground">{t('foundingBody')}</p>
+              <Button asChild size="lg" className="mt-8 h-12 gap-2 px-6">
+                <Link href={{ pathname: '/signup', query: { role: 'provider' } }}>
+                  {t('foundingCta')} <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            </div>
+          </section>
+        ) : null}
 
         {/* =====================================================
             Closing CTA

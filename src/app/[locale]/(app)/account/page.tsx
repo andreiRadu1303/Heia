@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { img, formatBookingDate } from '@/lib/app-mock-data';
 import { reconcilePaidSession } from '@/lib/payments-server';
 import { cn } from '@/lib/utils';
-import { logoutAction } from '../dashboard/actions';
+import { logoutAction, cancelMyBookingAction } from '../dashboard/actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,11 +92,12 @@ export default async function AccountPage({
                 const studio = b.studios;
                 const datePart = b.scheduled_at.slice(0, 10);
                 const timePart = b.scheduled_at.slice(11, 16);
+                const cancellable = b.status === 'pending' || b.status === 'confirmed';
                 return (
+                  <div key={b.id} className="rounded-3xl bg-card ring-1 ring-border">
                   <Link
-                    key={b.id}
                     href={studio ? `/studio/${studio.slug}` : '/dashboard'}
-                    className="flex items-center gap-3 rounded-3xl bg-card p-3 ring-1 ring-border"
+                    className="flex items-center gap-3 p-3"
                   >
                     {studio?.hero_seed ? (
                       <img
@@ -132,6 +133,20 @@ export default async function AccountPage({
                       {b.status}
                     </span>
                   </Link>
+
+                  {cancellable ? (
+                    <form action={cancelMyBookingAction} className="border-t border-border px-3 py-2">
+                      <input type="hidden" name="locale" value={locale} />
+                      <input type="hidden" name="bookingId" value={b.id} />
+                      <button
+                        type="submit"
+                        className="text-xs font-medium text-muted-foreground hover:text-destructive"
+                      >
+                        Cancel booking
+                      </button>
+                    </form>
+                  ) : null}
+                  </div>
                 );
               })}
             </div>

@@ -46,7 +46,9 @@ export default async function ServicesPage({
               <div className="absolute inset-0 flex flex-col justify-end p-4">
                 <div className="text-lg font-medium tracking-tight text-white">{c.name}</div>
                 <div className="text-xs text-white/80">
-                  {c.tagline} · {countFor(c.id)} nearby
+                  {countFor(c.id) > 0
+                    ? `${c.tagline} · ${countFor(c.id)} nearby`
+                    : `${c.tagline} · coming soon`}
                 </div>
               </div>
             </Link>
