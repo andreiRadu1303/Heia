@@ -6,6 +6,7 @@ import { useFormStatus } from 'react-dom';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { magicLinkLoginAction, passwordLoginAction, type LoginState } from './actions';
@@ -72,6 +73,14 @@ function PasswordForm({ locale, next }: { locale: string; next?: string }) {
       <Field id="password" name="password" type="password" autoComplete="current-password" required label={t('passwordLabel')} placeholder={t('passwordPlaceholder')} />
       {state.error ? <ErrorBox>{t(state.error as 'errorGeneric')}</ErrorBox> : null}
       <SubmitButton label={t('loginSubmit')} />
+      <p className="text-right text-sm">
+        <Link
+          href="/forgot-password"
+          className="font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          {t('forgotPassword')}
+        </Link>
+      </p>
     </form>
   );
 }
