@@ -342,7 +342,7 @@ export function SiteBuilder({
           <p className="rounded-xl border border-dashed border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
             {save === 'dirty'
               ? 'Unsaved changes — hit Save to store your design.'
-              : 'Your design is saved to your studio. The public page renders from it once content editing is wired.'}
+              : 'Your design is live: clients see it on your public studio page as soon as your profile is published.'}
           </p>
         </div>
 

@@ -9,6 +9,8 @@
  * we keep whole-lei integers and format with `lei`.
  */
 
+import type { SiteConfig } from '@/lib/site-config';
+
 /**
  * Curated Unsplash photo IDs per seed.
  *
@@ -162,6 +164,10 @@ export interface Studio {
   heroUrl?: string | null;
   avatarUrl?: string | null;
   galleryUrls?: string[];
+  /** Database id (real studios only; `id` is the slug used in URLs). */
+  dbId?: string;
+  /** Saved mini-site design (real studios only). Null = not designed yet. */
+  siteConfig?: SiteConfig | null;
 }
 
 /** Bucharest-ish centre, with small offsets per studio. */

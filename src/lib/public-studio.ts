@@ -4,6 +4,7 @@ import {
   type Studio,
   type ServiceOffering,
 } from '@/lib/app-mock-data';
+import type { SiteConfig } from '@/lib/site-config';
 
 interface PublicStudioRow {
   id: string;
@@ -26,6 +27,16 @@ interface PublicStudioRow {
   avatar_url: string | null;
   cover_url: string | null;
   gallery_urls: string[] | null;
+  site_config: unknown;
+}
+
+function isSiteConfig(value: unknown): value is SiteConfig {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    (value as SiteConfig).version === 1 &&
+    Array.isArray((value as SiteConfig).sections)
+  );
 }
 
 interface ServiceRow {
@@ -49,7 +60,7 @@ export async function getPublicStudioBySlug(slug: string): Promise<Studio | null
   const { data: row } = await supabase
     .from('studios')
     .select(
-      'id, slug, name, category_id, tagline, bio, city, address, lat, lng, known_for, price_from_lei, rating, review_count, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls',
+      'id, slug, name, category_id, tagline, bio, city, address, lat, lng, known_for, price_from_lei, rating, review_count, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls, site_config',
     )
     .eq('slug', slug)
     .maybeSingle();
@@ -96,5 +107,7 @@ export async function getPublicStudioBySlug(slug: string): Promise<Studio | null
     heroUrl: studio.cover_url,
     avatarUrl: studio.avatar_url,
     galleryUrls: studio.gallery_urls ?? [],
+    dbId: studio.id,
+    siteConfig: isSiteConfig(studio.site_config) ? studio.site_config : null,
   };
 }

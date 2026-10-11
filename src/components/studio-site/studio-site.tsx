@@ -24,19 +24,23 @@ import {
   type SiteConfig,
   type SiteSection,
 } from '@/lib/site-config';
+import type { DayHours } from '@/lib/availability';
 import { cn } from '@/lib/utils';
 
 export function StudioSite({
   studio,
   config,
   locale,
+  hours,
 }: {
   studio: Studio;
   config: SiteConfig;
   locale: string;
+  /** Real weekly hours; when omitted the Hours section shows sample times. */
+  hours?: DayHours[];
 }) {
   const preset = STYLE_PRESETS[config.theme.style];
-  const ctx = { studio, locale, preset };
+  const ctx = { studio, locale, preset, hours };
 
   return (
     <div
@@ -56,6 +60,7 @@ type Ctx = {
   studio: Studio;
   locale: string;
   preset: (typeof STYLE_PRESETS)[keyof typeof STYLE_PRESETS];
+  hours?: DayHours[];
 };
 
 function Section({ section, ctx }: { section: SiteSection; ctx: Ctx }) {
@@ -404,12 +409,31 @@ const SAMPLE_HOURS: [string, string][] = [
   ['Sun', 'Closed'],
 ];
 
+const WEEKDAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+/** Collapse consecutive days with identical hours: Mon–Fri 09:00 – 18:00. */
+function groupHours(hours: DayHours[]): [string, string][] {
+  const label = (h: DayHours) => (h.isOpen ? `${h.opensAt} – ${h.closesAt}` : 'Closed');
+  const out: [string, string][] = [];
+  let start = 0;
+  for (let i = 1; i <= hours.length; i++) {
+    if (i === hours.length || label(hours[i]) !== label(hours[start])) {
+      const from = WEEKDAY_SHORT[hours[start].weekday];
+      const to = WEEKDAY_SHORT[hours[i - 1].weekday];
+      out.push([from === to ? from : `${from}–${to}`, label(hours[start])]);
+      start = i;
+    }
+  }
+  return out;
+}
+
 function Hours({ ctx }: { ctx: Ctx }) {
+  const rows = ctx.hours ? groupHours(ctx.hours) : SAMPLE_HOURS;
   return (
     <Shell>
       <Eyebrow ctx={ctx}>Hours</Eyebrow>
       <dl className="mt-6 divide-y divide-[color:var(--site-border)]">
-        {SAMPLE_HOURS.map(([day, time]) => (
+        {rows.map(([day, time]) => (
           <div key={day} className="flex items-center justify-between py-3">
             <dt className="font-medium">{day}</dt>
             <dd className="text-[color:var(--site-fg-muted)]">{time}</dd>

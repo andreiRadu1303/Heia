@@ -11,7 +11,11 @@ import { getPublicStudioBySlug } from '@/lib/public-studio';
 import { getStudioReviewsBySlug } from '@/lib/reviews-server';
 import { isStudioSaved } from '@/lib/saved-studios';
 import { createClient } from '@/lib/supabase/server';
+import { getStudioHours } from '@/lib/availability';
 import { SaveStudioButton } from '@/components/app/save-studio-button';
+import { StudioSite } from '@/components/studio-site/studio-site';
+import type { Review as RealReview } from '@/lib/reviews';
+import { overall } from '@/lib/reviews';
 
 // Reads the session (for owner preview of unpublished pages) → render per request.
 export const dynamic = 'force-dynamic';
@@ -35,6 +39,32 @@ export default async function StudioPage({
     data: { user },
   } = await supabase.auth.getUser();
   const saved = user ? await isStudioSaved(id) : false;
+
+  // Expert designed a mini-site → render that instead of the generic layout.
+  // Content (name, services, photos, reviews, hours) is still the real data.
+  if (studio.siteConfig && studio.dbId) {
+    const hours = await getStudioHours(studio.dbId);
+    const siteStudio = { ...studio, reviews: reviews.map(toSiteReview) };
+    return (
+      <div className="min-h-dvh pb-24">
+        <AppTopBar title={studio.name} backHref={`/discover?category=${studio.categoryId}`} />
+        <div className="relative">
+          <SaveStudioButton
+            slug={studio.id}
+            locale={locale}
+            initialSaved={saved}
+            signedIn={!!user}
+            className="absolute right-4 top-4 z-10"
+          />
+          <StudioSite studio={siteStudio} config={studio.siteConfig} locale={locale} hours={hours} />
+        </div>
+        <div className="container pt-8">
+          <StudioReviews studioSlug={studio.id} reviews={reviews} locale={locale} />
+        </div>
+        <BookBar studio={studio} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh pb-24">
@@ -149,18 +179,45 @@ export default async function StudioPage({
         <StudioReviews studioSlug={studio.id} reviews={reviews} locale={locale} />
       </main>
 
-      {/* Sticky book bar */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
-        <div className="container flex items-center justify-between gap-4 py-3">
-          <div>
-            <div className="text-xs text-muted-foreground">From</div>
-            <div className="font-medium">{formatLei(studio.priceFromLei)}</div>
-          </div>
-          <Button asChild size="lg" className="h-12 px-8">
-            <Link href={`/studio/${studio.id}/book`}>Book now</Link>
-          </Button>
+      <BookBar studio={studio} />
+    </div>
+  );
+}
+
+/** Sticky "Book now" bar shared by both page layouts. */
+function BookBar({ studio }: { studio: { id: string; priceFromLei: number } }) {
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+      <div className="container flex items-center justify-between gap-4 py-3">
+        <div>
+          <div className="text-xs text-muted-foreground">From</div>
+          <div className="font-medium">{formatLei(studio.priceFromLei)}</div>
         </div>
+        <Button asChild size="lg" className="h-12 px-8">
+          <Link href={`/studio/${studio.id}/book`}>Book now</Link>
+        </Button>
       </div>
     </div>
   );
+}
+
+/** Map a real review onto the compact shape the mini-site's Reviews section draws. */
+function toSiteReview(r: RealReview) {
+  return {
+    id: r.id,
+    author: r.author,
+    avatarSeed: r.avatarSeed,
+    rating: overall(r.scores),
+    body: r.body,
+    ago: timeAgo(r.createdAt),
+  };
+}
+
+function timeAgo(iso: string): string {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+  if (days < 1) return 'today';
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}y ago`;
 }
