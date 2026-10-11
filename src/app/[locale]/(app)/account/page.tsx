@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { reconcilePaidSession } from '@/lib/payments-server';
 import { logoutAction } from '../dashboard/actions';
 import { AccountCard, type AccountProfile } from './account-card';
+import { PasswordCard } from './password-card';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ export default async function AccountPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ booked?: string; paid?: string; session_id?: string }>;
+  searchParams: Promise<{ booked?: string; paid?: string; session_id?: string; reset?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -78,6 +79,10 @@ export default async function AccountPage({
               city: cityRow?.city ?? null,
             }}
           />
+        </section>
+
+        <section>
+          <PasswordCard locale={locale} openByDefault={sp.reset === '1'} />
         </section>
 
         <form action={logoutAction}>
