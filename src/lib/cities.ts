@@ -21,6 +21,7 @@ export const CITIES: City[] = [
   { id: 'craiova', name: 'Craiova', lat: 44.3302, lng: 23.7949 },
   { id: 'oradea', name: 'Oradea', lat: 47.0465, lng: 21.9189 },
   { id: 'sibiu', name: 'Sibiu', lat: 45.7983, lng: 24.1256 },
+  { id: 'pitesti', name: 'Pitești', lat: 44.8565, lng: 24.8692 },
 ];
 
 export const DEFAULT_CITY_ID = 'bucuresti';
