@@ -8,6 +8,7 @@ import { CheckCircle2, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CITIES, resolveCity } from '@/lib/cities';
 import { updateProfileAction, type AccountState } from './actions';
 import { AvatarUploader } from './avatar-uploader';
 
@@ -17,6 +18,7 @@ export interface AccountProfile {
   marketing_consent: boolean;
   created_at: string | null;
   avatar_url: string | null;
+  city: string | null;
 }
 
 const initialState: AccountState = {};
@@ -48,6 +50,7 @@ export function AccountCard({
     ? new Date(profile.created_at).toLocaleDateString(locale)
     : '—';
   const roleLabel = profile.role === 'provider' ? 'Provider' : 'Client';
+  const city = resolveCity(profile.city);
 
   return (
     <Card>
@@ -94,6 +97,21 @@ export function AccountCard({
               />
             </label>
 
+            <label className="block space-y-1.5">
+              <span className="text-sm text-muted-foreground">City</span>
+              <select
+                name="city"
+                defaultValue={city.id}
+                className="h-11 w-full rounded-md border border-input bg-card px-3 text-base"
+              >
+                {CITIES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
             <Row label="Account type" value={roleLabel} />
 
             <label className="flex items-center justify-between gap-3 border-b border-border/60 pb-1.5">
@@ -125,6 +143,7 @@ export function AccountCard({
         ) : (
           <>
             <Row label="Name" value={profile.display_name || '—'} />
+            <Row label="City" value={city.name} />
             <Row label="Account type" value={roleLabel} />
             <Row
               label="Marketing updates"

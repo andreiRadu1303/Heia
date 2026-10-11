@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { createClient } from '@/lib/supabase/server';
+import { cityById } from '@/lib/cities';
 
 export interface AccountState {
   ok?: boolean;
@@ -20,9 +21,11 @@ export async function updateProfileAction(
   const locale = String(formData.get('locale') ?? 'ro');
   const displayName = String(formData.get('display_name') ?? '').trim();
   const marketingConsent = formData.get('marketing_consent') === 'on';
+  const cityId = String(formData.get('city') ?? '').trim();
 
   if (!displayName) return { error: 'Name is required.' };
   if (displayName.length > 80) return { error: 'Name is too long (max 80 characters).' };
+  if (cityId && !cityById(cityId)) return { error: 'Unknown city.' };
 
   const supabase = await createClient();
   const {
@@ -44,6 +47,9 @@ export async function updateProfileAction(
     .update({
       display_name: displayName,
       marketing_consent: marketingConsent,
+      // Only touch `city` when the form sent one, so the update still works
+      // before migration 011 adds the column.
+      ...(cityId ? { city: cityId } : {}),
       ...(consentChanged
         ? { marketing_consent_at: marketingConsent ? new Date().toISOString() : null }
         : {}),
@@ -52,7 +58,12 @@ export async function updateProfileAction(
 
   if (error) {
     console.error('updateProfileAction failed', error);
-    return { error: 'Could not save. Please try again.' };
+    return {
+      error:
+        cityId && /city/i.test(error.message)
+          ? 'Could not save. Make sure migration 011 has been run.'
+          : 'Could not save. Please try again.',
+    };
   }
 
   revalidatePath(`/${locale}/account`);

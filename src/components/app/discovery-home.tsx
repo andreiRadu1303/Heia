@@ -1,10 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { Search, SlidersHorizontal, X, Star, MapPin } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Star, MapPin, ChevronDown, Check } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import { CITIES, type City } from '@/lib/cities';
+import { setCityAction } from '@/app/[locale]/(app)/dashboard/actions';
 import {
   CATEGORIES,
   STUDIOS,
@@ -40,14 +42,36 @@ export function DiscoveryHome({
   firstName,
   initial,
   locale,
+  city: initialCity,
 }: {
   firstName: string;
   initial: string;
   locale: string;
+  city: City;
 }) {
   const [tag, setTag] = React.useState<string>('all');
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [filterOpen, setFilterOpen] = React.useState(false);
+  const [cityOpen, setCityOpen] = React.useState(false);
+  const [city, setCity] = React.useState<City>(initialCity);
+  const [cityError, setCityError] = React.useState<string | null>(null);
+  const [, startTransition] = React.useTransition();
+
+  // Optimistic: switch the UI at once, persist in the background, roll back
+  // (and say so) if the save fails.
+  function chooseCity(next: City) {
+    const previous = city;
+    setCity(next);
+    setCityError(null);
+    setCityOpen(false);
+    startTransition(async () => {
+      const res = await setCityAction(locale, next.id);
+      if (!res.ok) {
+        setCity(previous);
+        setCityError(res.error ?? 'Could not save city.');
+      }
+    });
+  }
   const [price, setPrice] = React.useState('any');
   const [rating, setRating] = React.useState('any');
   const [distance, setDistance] = React.useState('any');
@@ -56,6 +80,7 @@ export function DiscoveryHome({
 
   const filtered = React.useMemo(() => {
     return STUDIOS.filter((s) => {
+      if (s.city !== city.name) return false;
       if (tag !== 'all' && s.categoryId !== tag) return false;
       if (price === 'lt120' && !(s.priceFromLei < 120)) return false;
       if (price === '120-300' && !(s.priceFromLei >= 120 && s.priceFromLei <= 300)) return false;
@@ -64,9 +89,11 @@ export function DiscoveryHome({
       if (distance !== 'any' && !(s.distanceKm <= Number(distance))) return false;
       return true;
     });
-  }, [tag, price, rating, distance]);
+  }, [city, tag, price, rating, distance]);
 
-  const nearTitle = tag === 'all' ? 'Near you' : `${categoryById(tag)?.name} near you`;
+  const hasStudiosInCity = STUDIOS.some((s) => s.city === city.name);
+  const nearTitle =
+    tag === 'all' ? `In ${city.name}` : `${categoryById(tag)?.name} in ${city.name}`;
 
   return (
     <div className="min-h-dvh pb-16">
@@ -75,9 +102,21 @@ export function DiscoveryHome({
         <div className="container flex items-center gap-3 pt-4">
           <div className="min-w-0 flex-1">
             <div className="text-xs text-muted-foreground">Hi, {firstName}</div>
-            <div className="flex items-center gap-1 text-sm font-medium">
-              <MapPin className="size-3.5 text-accent" /> București
-            </div>
+            <button
+              type="button"
+              onClick={() => setCityOpen(true)}
+              aria-label={`Change city (currently ${city.name})`}
+              className="-ml-1 flex items-center gap-1 rounded-full px-1 text-sm font-medium hover:bg-secondary/60"
+            >
+              <MapPin className="size-3.5 text-accent" />
+              {city.name}
+              <ChevronDown className="size-3.5 text-muted-foreground" />
+            </button>
+            {cityError ? (
+              <div role="alert" className="mt-1 text-xs text-destructive">
+                {cityError}
+              </div>
+            ) : null}
           </div>
           <Link
             href="/account"
@@ -189,7 +228,20 @@ export function DiscoveryHome({
               See on map
             </Link>
           </div>
-          {filtered.length === 0 ? (
+          {!hasStudiosInCity ? (
+            <div className="rounded-3xl bg-card p-6 text-center ring-1 ring-border">
+              <p className="text-sm text-muted-foreground">
+                No studios in {city.name} yet — we&apos;re expanding city by city.
+              </p>
+              <button
+                type="button"
+                onClick={() => setCityOpen(true)}
+                className="mt-3 text-sm font-medium text-foreground underline-offset-4 hover:underline"
+              >
+                Choose another city
+              </button>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="rounded-3xl bg-card p-6 text-center ring-1 ring-border">
               <p className="text-sm text-muted-foreground">No matches with these filters.</p>
               <button
@@ -215,6 +267,9 @@ export function DiscoveryHome({
         </section>
       </main>
 
+      {cityOpen ? (
+        <CitySheet current={city} onChoose={chooseCity} onClose={() => setCityOpen(false)} />
+      ) : null}
       {searchOpen ? <SearchOverlay onClose={() => setSearchOpen(false)} /> : null}
       {filterOpen ? (
         <FilterSheet
@@ -398,6 +453,66 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function CitySheet({
+  current,
+  onChoose,
+  onClose,
+}: {
+  current: City;
+  onChoose: (city: City) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+      <button
+        type="button"
+        aria-label="Close city picker"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/40"
+      />
+      <div className="relative max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-background pb-[env(safe-area-inset-bottom)] shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h2 className="text-lg font-medium tracking-tight">Choose your city</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="grid size-9 place-items-center rounded-full hover:bg-secondary"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+
+        <ul className="px-3 py-3" role="listbox" aria-label="City">
+          {CITIES.map((c) => {
+            const active = c.id === current.id;
+            return (
+              <li key={c.id}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => onChoose(c)}
+                  className={cn(
+                    'flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-base',
+                    active ? 'bg-foreground text-background' : 'hover:bg-secondary/60',
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <MapPin className={cn('size-4', active ? 'text-background' : 'text-accent')} />
+                    {c.name}
+                  </span>
+                  {active ? <Check className="size-4" /> : null}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );

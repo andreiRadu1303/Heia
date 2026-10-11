@@ -54,6 +54,13 @@ export default async function AccountPage({
     .eq('id', user.id)
     .maybeSingle();
 
+  // Separate query so a not-yet-applied migration 011 only loses the city.
+  const { data: cityRow } = await supabase
+    .from('profiles')
+    .select('city')
+    .eq('id', user.id)
+    .maybeSingle();
+
   // RLS already restricts to bookings.client_id = auth.uid().
   const { data: bookingsRaw } = await supabase
     .from('bookings')
@@ -166,6 +173,7 @@ export default async function AccountPage({
               marketing_consent: profile?.marketing_consent ?? false,
               created_at: profile?.created_at ?? null,
               avatar_url: profile?.avatar_url ?? null,
+              city: cityRow?.city ?? null,
             }}
           />
         </section>
