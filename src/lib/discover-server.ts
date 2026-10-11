@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { CITY_CENTER, type Studio } from '@/lib/app-mock-data';
 import { cityByName } from '@/lib/cities';
 
-interface StudioListRow {
+export interface StudioListRow {
   id: string;
   slug: string;
   name: string;
@@ -25,8 +25,9 @@ interface StudioListRow {
   gallery_urls: string[] | null;
 }
 
-const LIST_COLUMNS =
+export const STUDIO_LIST_COLUMNS =
   'id, slug, name, category_id, tagline, bio, city, address, lat, lng, known_for, price_from_lei, rating, review_count, hero_seed, avatar_seed, gallery_seeds, cover_url, avatar_url, gallery_urls';
+const LIST_COLUMNS = STUDIO_LIST_COLUMNS;
 
 function hash(str: string): number {
   let h = 0;
@@ -46,6 +47,10 @@ function fallbackPoint(id: string, cityName: string | null): { lat: number; lng:
   const lngOffset = (((h >> 10) % 1000) / 1000 - 0.5) * 0.06;
   const centre = cityByName(cityName) ?? CITY_CENTER;
   return { lat: centre.lat + latOffset, lng: centre.lng + lngOffset };
+}
+
+export function mapStudioRow(row: StudioListRow): Studio {
+  return mapRow(row);
 }
 
 function mapRow(row: StudioListRow): Studio {

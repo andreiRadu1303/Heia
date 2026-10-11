@@ -9,6 +9,9 @@ import { StudioReviews } from '@/components/reviews/studio-reviews';
 import { studioById, categoryById, img, formatLei } from '@/lib/app-mock-data';
 import { getPublicStudioBySlug } from '@/lib/public-studio';
 import { getStudioReviewsBySlug } from '@/lib/reviews-server';
+import { isStudioSaved } from '@/lib/saved-studios';
+import { createClient } from '@/lib/supabase/server';
+import { SaveStudioButton } from '@/components/app/save-studio-button';
 
 // Reads the session (for owner preview of unpublished pages) → render per request.
 export const dynamic = 'force-dynamic';
@@ -26,6 +29,12 @@ export default async function StudioPage({
   if (!studio) notFound();
   const category = categoryById(studio.categoryId);
   const reviews = await getStudioReviewsBySlug(id);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const saved = user ? await isStudioSaved(id) : false;
 
   return (
     <div className="min-h-dvh pb-24">
@@ -50,6 +59,13 @@ export default async function StudioPage({
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent" />
+        <SaveStudioButton
+          slug={studio.id}
+          locale={locale}
+          initialSaved={saved}
+          signedIn={!!user}
+          className="absolute right-4 top-4"
+        />
         <div className="absolute bottom-4 left-0 right-0 px-5">
           <div className="flex items-center gap-2 text-xs font-medium text-white/85">
             <span className="rounded-full bg-white/95 px-2.5 py-1 text-black/80">

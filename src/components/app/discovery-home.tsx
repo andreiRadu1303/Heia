@@ -6,6 +6,7 @@ import { Search, SlidersHorizontal, X, Star, MapPin, ChevronDown, Check } from '
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { CITIES, normalizeCityName, type City } from '@/lib/cities';
+import { ClientNav } from '@/components/app/client-nav';
 import { setCityAction } from '@/app/[locale]/(app)/dashboard/actions';
 import {
   CATEGORIES,
@@ -112,7 +113,7 @@ export function DiscoveryHome({
     tag === 'all' ? `In ${city.name}` : `${categoryById(tag)?.name} in ${city.name}`;
 
   return (
-    <div className="min-h-dvh pb-16">
+    <div className="min-h-dvh pb-24">
       {/* Sticky top */}
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
         <div className="container flex items-center gap-3 pt-4">
@@ -316,6 +317,8 @@ export function DiscoveryHome({
           }}
         />
       ) : null}
+
+      <ClientNav />
     </div>
   );
 }
