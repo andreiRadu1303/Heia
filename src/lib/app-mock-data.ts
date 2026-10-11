@@ -561,26 +561,6 @@ export const WEEKLY_HOURS: WeeklyHour[] = [
   { day: 'Sunday', open: '10:00', close: '16:00', enabled: false },
 ];
 
-/* ================================================================
- * Client side — the logged-in client's own bookings (dashboard).
- * ================================================================ */
-
-export interface ClientBooking {
-  id: string;
-  studioId: string;
-  studioName: string;
-  serviceName: string;
-  date: string;
-  time: string;
-  status: BookingStatus;
-  heroSeed: string;
-}
-
-export const CLIENT_BOOKINGS: ClientBooking[] = [
-  { id: 'cb1', studioId: 'calm-rooms', studioName: 'Calm Rooms', serviceName: 'Deep tissue (60 min)', date: todayPlus(2), time: '18:00', status: 'confirmed', heroSeed: 'calm-hero' },
-  { id: 'cb2', studioId: 'nail-atelier', studioName: 'Nail Atelier', serviceName: 'Manicure + gel', date: todayPlus(6), time: '13:30', status: 'confirmed', heroSeed: 'nail-hero' },
-];
-
 function todayPlus(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() + days);

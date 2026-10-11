@@ -10,7 +10,6 @@ import { setCityAction } from '@/app/[locale]/(app)/dashboard/actions';
 import {
   CATEGORIES,
   STUDIOS,
-  CLIENT_BOOKINGS,
   categoryById,
   img,
   formatLei,
@@ -38,16 +37,31 @@ const DISTANCE_OPTIONS = [
   { id: '5', label: '5 km' },
 ];
 
+/** The client's next upcoming visit, read from `bookings` on the server. */
+export interface NextBooking {
+  id: string;
+  studioSlug: string | null;
+  studioName: string;
+  serviceName: string;
+  date: string; // 'YYYY-MM-DD'
+  time: string; // 'HH:MM'
+  status: 'pending' | 'confirmed';
+  imageUrl: string | null;
+  heroSeed: string | null;
+}
+
 export function DiscoveryHome({
   firstName,
   initial,
   locale,
   city: initialCity,
+  nextBooking,
 }: {
   firstName: string;
   initial: string;
   locale: string;
   city: City;
+  nextBooking: NextBooking | null;
 }) {
   const [tag, setTag] = React.useState<string>('all');
   const [searchOpen, setSearchOpen] = React.useState(false);
@@ -171,7 +185,7 @@ export function DiscoveryHome({
 
       <main className="container space-y-10 pt-5">
         {/* Upcoming */}
-        {CLIENT_BOOKINGS.length > 0 ? (
+        {nextBooking ? (
           <section>
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
@@ -182,24 +196,34 @@ export function DiscoveryHome({
               </Link>
             </div>
             <Link
-              href={`/studio/${CLIENT_BOOKINGS[0].studioId}`}
+              href={nextBooking.studioSlug ? `/studio/${nextBooking.studioSlug}` : '/account'}
               className="flex items-center gap-3 rounded-3xl bg-card p-3 ring-1 ring-border"
             >
-              <img
-                src={img.square(CLIENT_BOOKINGS[0].heroSeed)}
-                alt=""
-                className="size-14 shrink-0 rounded-2xl object-cover"
-              />
+              {nextBooking.imageUrl || nextBooking.heroSeed ? (
+                <img
+                  src={nextBooking.imageUrl ?? img.square(nextBooking.heroSeed as string)}
+                  alt=""
+                  className="size-14 shrink-0 rounded-2xl object-cover"
+                />
+              ) : (
+                <div
+                  className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent/30 to-secondary text-lg font-medium text-foreground/60"
+                  aria-hidden
+                >
+                  {nextBooking.studioName.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
-                <div className="truncate font-medium">{CLIENT_BOOKINGS[0].studioName}</div>
+                <div className="truncate font-medium">{nextBooking.studioName}</div>
                 <div className="truncate text-sm text-muted-foreground">
-                  {CLIENT_BOOKINGS[0].serviceName}
+                  {nextBooking.serviceName}
+                  {nextBooking.status === 'pending' ? ' · awaiting confirmation' : ''}
                 </div>
               </div>
               <div className="text-right text-xs text-muted-foreground">
-                {formatBookingDate(CLIENT_BOOKINGS[0].date, locale)}
+                {formatBookingDate(nextBooking.date, locale)}
                 <br />
-                {CLIENT_BOOKINGS[0].time}
+                {nextBooking.time}
               </div>
             </Link>
           </section>
