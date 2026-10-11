@@ -5,11 +5,10 @@ import { Search, SlidersHorizontal, X, Star, MapPin, ChevronDown, Check } from '
 
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { CITIES, type City } from '@/lib/cities';
+import { CITIES, normalizeCityName, type City } from '@/lib/cities';
 import { setCityAction } from '@/app/[locale]/(app)/dashboard/actions';
 import {
   CATEGORIES,
-  STUDIOS,
   categoryById,
   img,
   formatLei,
@@ -55,12 +54,15 @@ export function DiscoveryHome({
   initial,
   locale,
   city: initialCity,
+  studios,
   nextBooking,
 }: {
   firstName: string;
   initial: string;
   locale: string;
   city: City;
+  /** Published studios from Supabase, with distance from the chosen city. */
+  studios: Studio[];
   nextBooking: NextBooking | null;
 }) {
   const [tag, setTag] = React.useState<string>('all');
@@ -93,8 +95,8 @@ export function DiscoveryHome({
   const activeFilterCount = [price, rating, distance].filter((v) => v !== 'any').length;
 
   const filtered = React.useMemo(() => {
-    return STUDIOS.filter((s) => {
-      if (s.city !== city.name) return false;
+    return studios.filter((s) => {
+      if (!sameCity(s.city, city.name)) return false;
       if (tag !== 'all' && s.categoryId !== tag) return false;
       if (price === 'lt120' && !(s.priceFromLei < 120)) return false;
       if (price === '120-300' && !(s.priceFromLei >= 120 && s.priceFromLei <= 300)) return false;
@@ -103,9 +105,9 @@ export function DiscoveryHome({
       if (distance !== 'any' && !(s.distanceKm <= Number(distance))) return false;
       return true;
     });
-  }, [city, tag, price, rating, distance]);
+  }, [studios, city, tag, price, rating, distance]);
 
-  const hasStudiosInCity = STUDIOS.some((s) => s.city === city.name);
+  const hasStudiosInCity = studios.some((s) => sameCity(s.city, city.name));
   const nearTitle =
     tag === 'all' ? `In ${city.name}` : `${categoryById(tag)?.name} in ${city.name}`;
 
@@ -294,7 +296,9 @@ export function DiscoveryHome({
       {cityOpen ? (
         <CitySheet current={city} onChoose={chooseCity} onClose={() => setCityOpen(false)} />
       ) : null}
-      {searchOpen ? <SearchOverlay onClose={() => setSearchOpen(false)} /> : null}
+      {searchOpen ? (
+        <SearchOverlay studios={studios} onClose={() => setSearchOpen(false)} />
+      ) : null}
       {filterOpen ? (
         <FilterSheet
           price={price}
@@ -362,35 +366,63 @@ function CategoryBox({ category }: { category: Category }) {
   );
 }
 
+/** Uploaded cover → seeded placeholder → gradient initial. */
+function StudioThumb({ studio, className }: { studio: Studio; className: string }) {
+  const src = studio.heroUrl || (studio.heroSeed ? img.square(studio.heroSeed) : null);
+  return src ? (
+    <img src={src} alt="" className={cn('shrink-0 rounded-2xl object-cover', className)} />
+  ) : (
+    <div
+      className={cn(
+        'grid shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-accent/30 to-secondary text-lg font-medium text-foreground/60',
+        className,
+      )}
+      aria-hidden
+    >
+      {studio.name.charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
 function StudioRow({ studio }: { studio: Studio }) {
   return (
     <Link
       href={`/discover?category=${studio.categoryId}&focus=${studio.id}`}
       className="flex items-center gap-3 rounded-3xl bg-card p-3 ring-1 ring-border transition-transform hover:-translate-y-0.5"
     >
-      <img
-        src={img.square(studio.heroSeed)}
-        alt=""
-        className="size-20 shrink-0 rounded-2xl object-cover"
-      />
+      <StudioThumb studio={studio} className="size-20" />
       <div className="min-w-0 flex-1">
         <div className="truncate font-medium">{studio.name}</div>
         <div className="truncate text-sm text-muted-foreground">{studio.tagline}</div>
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            <Star className="size-3 fill-current text-accent" /> {studio.rating}
+            <Star className="size-3 fill-current text-accent" />{' '}
+            {studio.rating > 0 ? studio.rating : 'New'}
           </span>
           <span aria-hidden>·</span>
-          <span>{studio.distanceKm === 0 ? 'Mobile' : `${studio.distanceKm} km`}</span>
-          <span aria-hidden>·</span>
-          <span>{formatLei(studio.priceFromLei)}+</span>
+          <span>{studio.distanceKm} km</span>
+          {studio.priceFromLei > 0 ? (
+            <>
+              <span aria-hidden>·</span>
+              <span>{formatLei(studio.priceFromLei)}+</span>
+            </>
+          ) : null}
         </div>
       </div>
     </Link>
   );
 }
 
-function SearchOverlay({ onClose }: { onClose: () => void }) {
+/**
+ * Studios store the city as free text typed by the provider; compare it to
+ * the picker's name ignoring case, accents and surrounding spaces so
+ * "oradea" or "Bucuresti" still match.
+ */
+function sameCity(a: string, b: string): boolean {
+  return normalizeCityName(a) === normalizeCityName(b);
+}
+
+function SearchOverlay({ studios, onClose }: { studios: Studio[]; onClose: () => void }) {
   const [query, setQuery] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -400,7 +432,7 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
 
   const q = query.trim().toLowerCase();
   const results = q
-    ? STUDIOS.filter(
+    ? studios.filter(
         (s) =>
           s.name.toLowerCase().includes(q) ||
           s.tagline.toLowerCase().includes(q) ||
@@ -461,16 +493,12 @@ function SearchOverlay({ onClose }: { onClose: () => void }) {
                 onClick={onClose}
                 className="flex items-center gap-3 rounded-3xl bg-card p-3 ring-1 ring-border"
               >
-                <img
-                  src={img.square(s.heroSeed)}
-                  alt=""
-                  className="size-14 shrink-0 rounded-2xl object-cover"
-                />
+                <StudioThumb studio={s} className="size-14" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium">{s.name}</div>
                   <div className="truncate text-sm text-muted-foreground">{s.tagline}</div>
                   <div className="mt-0.5 text-xs text-muted-foreground">
-                    {categoryById(s.categoryId)?.name} · ★ {s.rating}
+                    {categoryById(s.categoryId)?.name} · ★ {s.rating > 0 ? s.rating : 'New'}
                   </div>
                 </div>
               </Link>

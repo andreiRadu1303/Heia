@@ -2,7 +2,8 @@ import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { resolveCity } from '@/lib/cities';
+import { resolveCity, distanceKm } from '@/lib/cities';
+import { getPublishedStudios } from '@/lib/discover-server';
 import { DiscoveryHome, type NextBooking } from '@/components/app/discovery-home';
 
 // Auth-gated: always run per request.
@@ -38,6 +39,13 @@ export default async function ClientHome({
     .eq('id', user.id)
     .maybeSingle();
   const city = resolveCity(cityRow?.city);
+
+  // Real published studios; distance is measured from the chosen city's
+  // centre (addresses aren't geocoded yet, see discover-server.ts).
+  const studios = (await getPublishedStudios()).map((s) => ({
+    ...s,
+    distanceKm: distanceKm(city, s),
+  }));
 
   // The client's next upcoming visit (RLS limits rows to their own bookings).
   // `scheduled_at` is stored as a naive local datetime, so compare against a
@@ -79,6 +87,7 @@ export default async function ClientHome({
       initial={initial}
       locale={locale}
       city={city}
+      studios={studios}
       nextBooking={nextBooking}
     />
   );

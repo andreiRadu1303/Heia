@@ -34,3 +34,34 @@ export function cityById(id: string | null | undefined): City | undefined {
 export function resolveCity(id: string | null | undefined): City {
   return cityById(id) ?? (cityById(DEFAULT_CITY_ID) as City);
 }
+
+/** Great-circle distance in km between two points, rounded to 0.1 km. */
+export function distanceKm(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return Math.round(2 * R * Math.asin(Math.sqrt(h)) * 10) / 10;
+}
+
+/** Normalise free-text city names: case, accents and surrounding spaces. */
+export function normalizeCityName(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+/** Look up a city by its display name as typed by a provider ("oradea" works). */
+export function cityByName(name: string | null | undefined): City | undefined {
+  if (!name) return undefined;
+  const n = normalizeCityName(name);
+  return CITIES.find((c) => normalizeCityName(c.name) === n);
+}

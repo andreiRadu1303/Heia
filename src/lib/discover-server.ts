@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { CITY_CENTER, type Studio } from '@/lib/app-mock-data';
+import { cityByName } from '@/lib/cities';
 
 interface StudioListRow {
   id: string;
@@ -39,16 +40,19 @@ function hash(str: string): number {
  * still shows distinct pins. Real geocoding on save is a follow-up (see
  * qa-and-roadmap.md); the mockup map doesn't need precise coordinates.
  */
-function fallbackPoint(id: string): { lat: number; lng: number } {
+function fallbackPoint(id: string, cityName: string | null): { lat: number; lng: number } {
   const h = hash(id);
   const latOffset = ((h % 1000) / 1000 - 0.5) * 0.04; // ~±2 km
   const lngOffset = (((h >> 10) % 1000) / 1000 - 0.5) * 0.06;
-  return { lat: CITY_CENTER.lat + latOffset, lng: CITY_CENTER.lng + lngOffset };
+  const centre = cityByName(cityName) ?? CITY_CENTER;
+  return { lat: centre.lat + latOffset, lng: centre.lng + lngOffset };
 }
 
 function mapRow(row: StudioListRow): Studio {
   const point =
-    row.lat != null && row.lng != null ? { lat: row.lat, lng: row.lng } : fallbackPoint(row.id);
+    row.lat != null && row.lng != null
+      ? { lat: row.lat, lng: row.lng }
+      : fallbackPoint(row.id, row.city);
   return {
     id: row.slug,
     name: row.name,
