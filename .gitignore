@@ -35,3 +35,6 @@ Thumbs.db
 *.pem
 .vercel
 coverage
+
+# Claude Code (machine-specific launch config)
+.claude/

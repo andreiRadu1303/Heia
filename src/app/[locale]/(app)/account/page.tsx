@@ -5,11 +5,12 @@ import { createClient } from '@/lib/supabase/server';
 import { Link } from '@/i18n/navigation';
 import { AppTopBar } from '@/components/app/app-top-bar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { img, formatBookingDate } from '@/lib/app-mock-data';
 import { reconcilePaidSession } from '@/lib/payments-server';
 import { cn } from '@/lib/utils';
 import { logoutAction, cancelMyBookingAction } from '../dashboard/actions';
+import { AccountCard, type AccountProfile } from './account-card';
 
 export const dynamic = 'force-dynamic';
 
@@ -156,31 +157,16 @@ export default async function AccountPage({
         {/* Account */}
         <section>
           <h2 className="mb-4 text-xl font-medium tracking-tight">Account</h2>
-          <Card>
-            <CardHeader>
-              <CardDescription>Signed in as</CardDescription>
-              <CardTitle className="text-lg">{user.email}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <Row label="Name" value={profile?.display_name ?? '—'} />
-              <Row
-                label="Account type"
-                value={profile?.role === 'provider' ? 'Provider' : 'Client'}
-              />
-              <Row
-                label="Marketing updates"
-                value={profile?.marketing_consent ? 'Subscribed' : 'Off'}
-              />
-              <Row
-                label="Member since"
-                value={
-                  profile?.created_at
-                    ? new Date(profile.created_at).toLocaleDateString(locale)
-                    : '—'
-                }
-              />
-            </CardContent>
-          </Card>
+          <AccountCard
+            email={user.email ?? ''}
+            locale={locale}
+            profile={{
+              display_name: profile?.display_name ?? '',
+              role: (profile?.role as AccountProfile['role']) ?? null,
+              marketing_consent: profile?.marketing_consent ?? false,
+              created_at: profile?.created_at ?? null,
+            }}
+          />
         </section>
 
         <form action={logoutAction}>
@@ -190,15 +176,6 @@ export default async function AccountPage({
           </Button>
         </form>
       </main>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-border/60 pb-1.5 last:border-b-0">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="truncate font-medium">{value}</span>
     </div>
   );
 }
