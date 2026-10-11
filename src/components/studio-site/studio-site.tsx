@@ -318,7 +318,12 @@ function Services({ variant, ctx }: { variant: string; ctx: Ctx }) {
 
 function Gallery({ variant, ctx }: { variant: string; ctx: Ctx }) {
   const { studio } = ctx;
-  if (studio.gallerySeeds.length === 0) return null;
+
+  // Uploaded portfolio photos first; seeded placeholders only for demo studios.
+  const uploaded = studio.galleryUrls ?? [];
+  const tall = uploaded.length > 0 ? uploaded : studio.gallerySeeds.map((s) => img.hero(s));
+  const square = uploaded.length > 0 ? uploaded : studio.gallerySeeds.map((s) => img.square(s));
+  if (square.length === 0) return null;
 
   if (variant === 'strip') {
     return (
@@ -327,10 +332,10 @@ function Gallery({ variant, ctx }: { variant: string; ctx: Ctx }) {
           <Eyebrow ctx={ctx}>Portfolio</Eyebrow>
         </div>
         <div className="flex snap-x gap-[var(--site-gap)] overflow-x-auto px-6 pb-2 sm:px-10">
-          {studio.gallerySeeds.map((seed) => (
+          {tall.map((src) => (
             <img
-              key={seed}
-              src={img.hero(seed)}
+              key={src}
+              src={src}
               alt=""
               className="h-72 w-56 shrink-0 snap-start rounded-[var(--site-radius)] object-cover sm:h-96 sm:w-72"
             />
@@ -344,10 +349,10 @@ function Gallery({ variant, ctx }: { variant: string; ctx: Ctx }) {
     <Shell>
       <Eyebrow ctx={ctx}>Portfolio</Eyebrow>
       <div className="mt-6 grid grid-cols-2 gap-[var(--site-gap)] sm:grid-cols-3">
-        {studio.gallerySeeds.map((seed) => (
+        {square.map((src) => (
           <img
-            key={seed}
-            src={img.square(seed)}
+            key={src}
+            src={src}
             alt=""
             className="aspect-square w-full rounded-[var(--site-radius)] object-cover"
           />
