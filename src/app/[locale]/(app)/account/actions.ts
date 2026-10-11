@@ -59,3 +59,32 @@ export async function updateProfileAction(
   revalidatePath(`/${locale}/dashboard`);
   return { ok: true };
 }
+
+/**
+ * Persist the user's profile photo URL (the file itself is uploaded to
+ * Supabase Storage from the client). Pass `null` to remove the photo.
+ */
+export async function saveAvatarAction(
+  locale: string,
+  avatarUrl: string | null,
+): Promise<AccountState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'You are signed out. Please sign in again.' };
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({ avatar_url: avatarUrl })
+    .eq('id', user.id);
+
+  if (error) {
+    console.error('saveAvatarAction failed', error);
+    return { error: 'Could not save photo. Please try again.' };
+  }
+
+  revalidatePath(`/${locale}/account`);
+  revalidatePath(`/${locale}/dashboard`);
+  return { ok: true };
+}

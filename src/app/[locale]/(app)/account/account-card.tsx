@@ -9,12 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { updateProfileAction, type AccountState } from './actions';
+import { AvatarUploader } from './avatar-uploader';
 
 export interface AccountProfile {
   display_name: string;
   role: 'client' | 'provider' | null;
   marketing_consent: boolean;
   created_at: string | null;
+  avatar_url: string | null;
 }
 
 const initialState: AccountState = {};
@@ -68,6 +70,14 @@ export function AccountCard({
       </CardHeader>
 
       <CardContent className="space-y-2 text-sm">
+        <div className="pb-3">
+          <AvatarUploader
+            locale={locale}
+            initialUrl={profile.avatar_url}
+            name={profile.display_name}
+          />
+        </div>
+
         {editing ? (
           <form action={formAction} className="space-y-4">
             <input type="hidden" name="locale" value={locale} />

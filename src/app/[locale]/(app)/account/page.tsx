@@ -50,7 +50,7 @@ export default async function AccountPage({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, role, marketing_consent, created_at')
+    .select('display_name, role, marketing_consent, created_at, avatar_url')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -165,6 +165,7 @@ export default async function AccountPage({
               role: (profile?.role as AccountProfile['role']) ?? null,
               marketing_consent: profile?.marketing_consent ?? false,
               created_at: profile?.created_at ?? null,
+              avatar_url: profile?.avatar_url ?? null,
             }}
           />
         </section>
