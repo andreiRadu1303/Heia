@@ -242,7 +242,8 @@ function About({ ctx }: { ctx: Ctx }) {
   return (
     <Shell>
       <Eyebrow ctx={ctx}>About</Eyebrow>
-      <p className="mt-4 text-xl leading-relaxed sm:text-2xl">{studio.bio}</p>
+      {/* whitespace-pre-line keeps the paragraphs the expert typed in the editor. */}
+      <p className="mt-4 whitespace-pre-line text-xl leading-relaxed sm:text-2xl">{studio.bio}</p>
       {studio.knownFor.length > 0 ? (
         <div className="mt-6 flex flex-wrap gap-[var(--site-gap)]">
           {studio.knownFor.map((tag) => (

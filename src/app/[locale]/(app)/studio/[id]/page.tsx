@@ -131,7 +131,8 @@ export default async function StudioPage({
         </div>
 
         {/* Bio */}
-        <p className="leading-relaxed text-foreground/90">{studio.bio}</p>
+        {/* Keep the paragraphs / line breaks the expert typed in the profile editor. */}
+        <p className="whitespace-pre-line leading-relaxed text-foreground/90">{studio.bio}</p>
 
         {/* Services */}
         <section>
