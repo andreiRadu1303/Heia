@@ -41,12 +41,12 @@ export default async function AccountPage({
     .eq('id', user.id)
     .maybeSingle();
 
-  // Separate query so a not-yet-applied migration 011 only loses the city.
-  const { data: cityRow } = await supabase
-    .from('profiles')
-    .select('city')
-    .eq('id', user.id)
-    .maybeSingle();
+  // Separate queries so a not-yet-applied migration (011 city, 013 phone)
+  // only loses that one field.
+  const [{ data: cityRow }, { data: phoneRow }] = await Promise.all([
+    supabase.from('profiles').select('city').eq('id', user.id).maybeSingle(),
+    supabase.from('profiles').select('phone').eq('id', user.id).maybeSingle(),
+  ]);
 
   const justBooked = sp.booked === '1';
 
@@ -77,6 +77,7 @@ export default async function AccountPage({
               created_at: profile?.created_at ?? null,
               avatar_url: profile?.avatar_url ?? null,
               city: cityRow?.city ?? null,
+              phone: phoneRow?.phone ?? null,
             }}
           />
         </section>

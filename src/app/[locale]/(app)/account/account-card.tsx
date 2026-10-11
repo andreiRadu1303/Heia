@@ -19,6 +19,7 @@ export interface AccountProfile {
   created_at: string | null;
   avatar_url: string | null;
   city: string | null;
+  phone: string | null;
 }
 
 const initialState: AccountState = {};
@@ -98,6 +99,19 @@ export function AccountCard({
             </label>
 
             <label className="block space-y-1.5">
+              <span className="text-sm text-muted-foreground">Phone number</span>
+              <Input
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                defaultValue={profile.phone ?? ''}
+                placeholder="+40 721 123 456"
+                className="h-11 bg-card text-base"
+              />
+            </label>
+
+            <label className="block space-y-1.5">
               <span className="text-sm text-muted-foreground">City</span>
               <select
                 name="city"
@@ -143,6 +157,7 @@ export function AccountCard({
         ) : (
           <>
             <Row label="Name" value={profile.display_name || '—'} />
+            <Row label="Phone number" value={profile.phone || '—'} />
             <Row label="City" value={city.name} />
             <Row label="Account type" value={roleLabel} />
             <Row

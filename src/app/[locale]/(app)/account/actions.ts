@@ -23,10 +23,18 @@ export async function updateProfileAction(
   const displayName = String(formData.get('display_name') ?? '').trim();
   const marketingConsent = formData.get('marketing_consent') === 'on';
   const cityId = String(formData.get('city') ?? '').trim();
+  const phoneRaw = String(formData.get('phone') ?? '').trim();
+  const phoneSent = formData.has('phone');
 
   if (!displayName) return { error: 'Name is required.' };
   if (displayName.length > 80) return { error: 'Name is too long (max 80 characters).' };
   if (cityId && !cityById(cityId)) return { error: 'Unknown city.' };
+
+  // Normalise "+40 (721) 123-456" → "+40721123456"; empty clears the number.
+  const phone = phoneRaw ? phoneRaw.replace(/[\s().-]/g, '') : null;
+  if (phone && !/^\+?\d{7,15}$/.test(phone)) {
+    return { error: 'Enter a valid phone number (digits only, e.g. +40 721 123 456).' };
+  }
 
   const supabase = await createClient();
   const {
@@ -51,6 +59,8 @@ export async function updateProfileAction(
       // Only touch `city` when the form sent one, so the update still works
       // before migration 011 adds the column.
       ...(cityId ? { city: cityId } : {}),
+      // Same for `phone` (migration 013).
+      ...(phoneSent ? { phone } : {}),
       ...(consentChanged
         ? { marketing_consent_at: marketingConsent ? new Date().toISOString() : null }
         : {}),
@@ -59,11 +69,16 @@ export async function updateProfileAction(
 
   if (error) {
     console.error('updateProfileAction failed', error);
+    const missing =
+      cityId && /city/i.test(error.message)
+        ? '011'
+        : phoneSent && /phone/i.test(error.message)
+          ? '013'
+          : null;
     return {
-      error:
-        cityId && /city/i.test(error.message)
-          ? 'Could not save. Make sure migration 011 has been run.'
-          : 'Could not save. Please try again.',
+      error: missing
+        ? `Could not save. Make sure migration ${missing} has been run.`
+        : 'Could not save. Please try again.',
     };
   }
 
