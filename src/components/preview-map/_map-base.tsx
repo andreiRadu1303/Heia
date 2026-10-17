@@ -82,6 +82,11 @@ export function MapBase<T extends BaseMarker = MapPin>({
       if (cancelled || !containerRef.current) return;
       libRef.current = maplibregl;
 
+      // Next's bundler doesn't emit MapLibre's `new URL(...)` worker, so the
+      // default worker URL 404s and the map stays blank. Serve our own copy
+      // (public/, kept in sync by scripts/copy-maplibre-worker.js).
+      maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs');
+
       const map = new maplibregl.Map({
         container: containerRef.current,
         style: STYLE_URL,
@@ -151,7 +156,10 @@ export function MapBase<T extends BaseMarker = MapPin>({
 
   return (
     <div className={cn('relative overflow-hidden bg-secondary/40', className)}>
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* size-full is required: maplibre-gl.css forces `.maplibregl-map` to
+          position: relative, which defeats `absolute inset-0` and collapses
+          the height to 0 (blank map). */}
+      <div ref={containerRef} className="absolute inset-0 size-full" />
     </div>
   );
 }
