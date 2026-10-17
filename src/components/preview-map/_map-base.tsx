@@ -82,6 +82,12 @@ export function MapBase<T extends BaseMarker = MapPin>({
       if (cancelled || !containerRef.current) return;
       libRef.current = maplibregl;
 
+      // MapLibre derives its worker URL from `import.meta.url`, which Next.js
+      // rewrites to a path that 404s to HTML — the browser then refuses it for
+      // having a non-JS MIME type and the map never starts. We serve our own
+      // copy from /public instead (see scripts/copy-maplibre-worker.mjs).
+      maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.js');
+
       const map = new maplibregl.Map({
         container: containerRef.current,
         style: STYLE_URL,
