@@ -151,9 +151,9 @@ export const DENSITIES: Record<
   DensityId,
   { label: string; section: string; gap: string }
 > = {
-  compact: { label: 'Compact', section: '2.5rem', gap: '0.75rem' },
-  cozy: { label: 'Cozy', section: '4rem', gap: '1.25rem' },
-  airy: { label: 'Airy', section: '6rem', gap: '2rem' },
+  compact: { label: 'Compact', section: '1.5rem', gap: '0.5rem' },
+  cozy: { label: 'Cozy', section: '2.25rem', gap: '0.75rem' },
+  airy: { label: 'Airy', section: '3.5rem', gap: '1.25rem' },
 };
 
 /**
@@ -292,42 +292,42 @@ export const TEMPLATES: TemplateDef[] = [
     id: 'editorial-warm',
     name: 'Editorial Warm',
     description: 'Ivory & mocha, italic serif. Calm, feminine, magazine-like.',
-    theme: { palette: 'warm-premium', style: 'editorial', radius: 'soft', density: 'airy' },
+    theme: { palette: 'warm-premium', style: 'editorial', radius: 'soft', density: 'cozy' },
     sections: baseSections('photo'),
   },
   {
     id: 'rose-boutique',
     name: 'Rose Boutique',
     description: 'Dusty rose & wine, classic serif. Soft-glam salon feel.',
-    theme: { palette: 'rose-atelier', style: 'boutique-classic', radius: 'round', density: 'cozy' },
+    theme: { palette: 'rose-atelier', style: 'boutique-classic', radius: 'round', density: 'compact' },
     sections: baseSections('split'),
   },
   {
     id: 'minimal-cool',
     name: 'Minimal Cool',
     description: 'White, grey, jet black. Clean, understated, type-forward.',
-    theme: { palette: 'cool-neutral', style: 'minimal-tech', radius: 'sharp', density: 'airy' },
+    theme: { palette: 'cool-neutral', style: 'minimal-tech', radius: 'sharp', density: 'cozy' },
     sections: baseSections('minimal'),
   },
   {
     id: 'dark-luxe',
     name: 'Dark Luxe',
     description: 'Warm dark with brass. Premium, editorial, high-contrast.',
-    theme: { palette: 'soft-black', style: 'editorial', radius: 'soft', density: 'airy' },
+    theme: { palette: 'soft-black', style: 'editorial', radius: 'soft', density: 'cozy' },
     sections: baseSections('photo'),
   },
   {
     id: 'organic-sage',
     name: 'Organic Sage',
     description: 'Bone & sage green. Botanical, wellness, unhurried.',
-    theme: { palette: 'sage-studio', style: 'soft-organic', radius: 'round', density: 'cozy' },
+    theme: { palette: 'sage-studio', style: 'soft-organic', radius: 'round', density: 'compact' },
     sections: baseSections('split'),
   },
   {
     id: 'bold-onyx',
     name: 'Bold Onyx',
     description: 'Black with electric blue. Confident, modern, grid-driven.',
-    theme: { palette: 'onyx-editorial', style: 'modern-geometric', radius: 'sharp', density: 'cozy' },
+    theme: { palette: 'onyx-editorial', style: 'modern-geometric', radius: 'sharp', density: 'compact' },
     sections: baseSections('split'),
   },
 ];

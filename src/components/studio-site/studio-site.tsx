@@ -12,18 +12,8 @@
 import { MapPin, Star, Clock, ArrowRight, Quote } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';
-import {
-  img,
-  formatLei,
-  categoryById,
-  type Studio,
-} from '@/lib/app-mock-data';
-import {
-  themeVars,
-  STYLE_PRESETS,
-  type SiteConfig,
-  type SiteSection,
-} from '@/lib/site-config';
+import { img, formatLei, categoryById, type Studio } from '@/lib/app-mock-data';
+import { themeVars, STYLE_PRESETS, type SiteConfig, type SiteSection } from '@/lib/site-config';
 import type { DayHours } from '@/lib/availability';
 import { cn } from '@/lib/utils';
 
@@ -109,12 +99,7 @@ function Display({
 
 function Eyebrow({ ctx, children }: { ctx: Ctx; children: React.ReactNode }) {
   return (
-    <div
-      className={cn(
-        'text-[11px] text-[color:var(--site-accent)]',
-        ctx.preset.eyebrowClass,
-      )}
-    >
+    <div className={cn('text-[11px] text-[color:var(--site-accent)]', ctx.preset.eyebrowClass)}>
       {children}
     </div>
   );
@@ -150,13 +135,13 @@ function Hero({ variant, ctx }: { variant: string; ctx: Ctx }) {
       <section className="px-6 py-[var(--site-section-y)] sm:px-10">
         <div className="mx-auto w-full max-w-3xl">
           <Eyebrow ctx={ctx}>{category?.name}</Eyebrow>
-          <Display ctx={ctx} className="mt-4 text-5xl leading-[1.02] sm:text-7xl">
+          <Display ctx={ctx} className="mt-3 text-4xl leading-[1.05] sm:text-5xl">
             {studio.name}
           </Display>
-          <p className="mt-5 max-w-xl text-lg text-[color:var(--site-fg-muted)]">
+          <p className="mt-3 max-w-xl text-base text-[color:var(--site-fg-muted)]">
             {studio.tagline}
           </p>
-          <div className="mt-6 flex items-center gap-4 text-sm text-[color:var(--site-fg-muted)]">
+          <div className="mt-3 flex items-center gap-4 text-sm text-[color:var(--site-fg-muted)]">
             <span className="inline-flex items-center gap-1.5">
               <Star className="size-4 fill-[var(--site-accent)] text-[color:var(--site-accent)]" />
               {studio.rating.toFixed(1)} · {studio.reviewCount}
@@ -171,61 +156,71 @@ function Hero({ variant, ctx }: { variant: string; ctx: Ctx }) {
   }
 
   if (variant === 'split') {
+    // Full-bleed on phones; on desktop a rounded card in the same centred
+    // column the other sections use (max-w-3xl), so it lines up with About.
     return (
-      <section className="grid sm:grid-cols-2">
-        <div
-          className="min-h-[280px] bg-cover bg-center sm:min-h-[520px]"
-          style={heroStyle}
-          aria-hidden
-        />
-        <div className="flex flex-col justify-center bg-[var(--site-surface)] px-6 py-[var(--site-section-y)] sm:px-10">
-          <Eyebrow ctx={ctx}>{category?.name}</Eyebrow>
-          <Display ctx={ctx} className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
-            {studio.name}
-          </Display>
-          <p className="mt-4 text-base text-[color:var(--site-fg-muted)]">{studio.tagline}</p>
-          <div className="mt-6 flex items-center gap-4 text-sm text-[color:var(--site-fg-muted)]">
-            <span className="inline-flex items-center gap-1.5">
-              <Star className="size-4 fill-[var(--site-accent)] text-[color:var(--site-accent)]" />
-              {studio.rating.toFixed(1)}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="size-4" /> {studio.city}
-            </span>
+      <section className="sm:px-10 sm:pt-[var(--site-section-y)]">
+        <div className="mx-auto grid w-full max-w-3xl overflow-hidden sm:grid-cols-2 sm:rounded-[var(--site-radius)] sm:border sm:border-[color:var(--site-border)]">
+          <div
+            className="min-h-[220px] bg-cover bg-center sm:min-h-[340px]"
+            style={heroStyle}
+            aria-hidden
+          />
+          <div className="flex flex-col justify-center bg-[var(--site-surface)] px-6 py-[var(--site-section-y)] sm:px-8">
+            <Eyebrow ctx={ctx}>{category?.name}</Eyebrow>
+            <Display ctx={ctx} className="mt-3 text-3xl leading-[1.05] sm:text-4xl">
+              {studio.name}
+            </Display>
+            <p className="mt-2 text-base text-[color:var(--site-fg-muted)]">{studio.tagline}</p>
+            <div className="mt-4 flex items-center gap-4 text-sm text-[color:var(--site-fg-muted)]">
+              <span className="inline-flex items-center gap-1.5">
+                <Star className="size-4 fill-[var(--site-accent)] text-[color:var(--site-accent)]" />
+                {studio.rating.toFixed(1)}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-4" /> {studio.city}
+              </span>
+            </div>
           </div>
         </div>
       </section>
     );
   }
 
-  // variant === 'photo' (default)
+  // variant === 'photo' (default). Full-bleed on phones; on desktop a rounded
+  // photo card in the shared centred column so it lines up with About.
   return (
-    <section className="relative flex min-h-[70vh] items-end bg-cover bg-center" style={heroStyle}>
+    <section className="sm:px-10 sm:pt-[var(--site-section-y)]">
       <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(to top, var(--site-bg) 4%, color-mix(in srgb, var(--site-bg) 30%, transparent) 45%, transparent 80%)',
-        }}
-        aria-hidden
-      />
-      <div className="relative w-full px-6 pb-[var(--site-section-y)] sm:px-10">
-        <div className="mx-auto w-full max-w-3xl">
-          <Eyebrow ctx={ctx}>{category?.name}</Eyebrow>
-          <Display ctx={ctx} className="mt-3 text-5xl leading-[1.02] sm:text-7xl">
-            {studio.name}
-          </Display>
-          <p className="mt-4 max-w-xl text-lg text-[color:var(--site-fg-muted)]">
-            {studio.tagline}
-          </p>
-          <div className="mt-5 flex items-center gap-4 text-sm text-[color:var(--site-fg-muted)]">
-            <span className="inline-flex items-center gap-1.5">
-              <Star className="size-4 fill-[var(--site-accent)] text-[color:var(--site-accent)]" />
-              {studio.rating.toFixed(1)} · {studio.reviewCount}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="size-4" /> {studio.city}
-            </span>
+        className="relative mx-auto flex min-h-[44vh] w-full max-w-3xl items-end overflow-hidden bg-cover bg-center sm:min-h-[48vh] sm:rounded-[var(--site-radius)]"
+        style={heroStyle}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to top, var(--site-bg) 4%, color-mix(in srgb, var(--site-bg) 30%, transparent) 45%, transparent 80%)',
+          }}
+          aria-hidden
+        />
+        <div className="relative w-full px-6 pb-6 sm:px-8 sm:pb-8">
+          <div className="w-full">
+            <Eyebrow ctx={ctx}>{category?.name}</Eyebrow>
+            <Display ctx={ctx} className="mt-2 text-4xl leading-[1.05] sm:text-5xl">
+              {studio.name}
+            </Display>
+            <p className="mt-2 max-w-xl text-base text-[color:var(--site-fg-muted)]">
+              {studio.tagline}
+            </p>
+            <div className="mt-3 flex items-center gap-4 text-sm text-[color:var(--site-fg-muted)]">
+              <span className="inline-flex items-center gap-1.5">
+                <Star className="size-4 fill-[var(--site-accent)] text-[color:var(--site-accent)]" />
+                {studio.rating.toFixed(1)} · {studio.reviewCount}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-4" /> {studio.city}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -243,9 +238,9 @@ function About({ ctx }: { ctx: Ctx }) {
     <Shell>
       <Eyebrow ctx={ctx}>About</Eyebrow>
       {/* whitespace-pre-line keeps the paragraphs the expert typed in the editor. */}
-      <p className="mt-4 whitespace-pre-line text-xl leading-relaxed sm:text-2xl">{studio.bio}</p>
+      <p className="mt-3 whitespace-pre-line text-base leading-relaxed sm:text-lg">{studio.bio}</p>
       {studio.knownFor.length > 0 ? (
-        <div className="mt-6 flex flex-wrap gap-[var(--site-gap)]">
+        <div className="mt-4 flex flex-wrap gap-[var(--site-gap)]">
           {studio.knownFor.map((tag) => (
             <span
               key={tag}
@@ -270,31 +265,31 @@ function Services({ variant, ctx }: { variant: string; ctx: Ctx }) {
   return (
     <Shell className="bg-[var(--site-surface)]">
       <Eyebrow ctx={ctx}>Services</Eyebrow>
-      <Display ctx={ctx} className="mt-3 text-3xl sm:text-4xl">
+      <Display ctx={ctx} className="mt-2 text-2xl sm:text-3xl">
         What I offer
       </Display>
 
       {variant === 'cards' ? (
-        <div className="mt-8 grid gap-[var(--site-gap)] sm:grid-cols-2">
+        <div className="mt-5 grid gap-[var(--site-gap)] sm:grid-cols-2">
           {studio.services.map((s) => (
             <div
               key={s.id}
-              className="rounded-[var(--site-radius)] border border-[color:var(--site-border)] bg-[var(--site-bg)] p-5"
+              className="rounded-[var(--site-radius)] border border-[color:var(--site-border)] bg-[var(--site-bg)] p-4"
             >
               <div className="font-medium">{s.name}</div>
-              <div className="mt-1 flex items-center gap-1.5 text-sm text-[color:var(--site-fg-muted)]">
+              <div className="mt-0.5 flex items-center gap-1.5 text-sm text-[color:var(--site-fg-muted)]">
                 <Clock className="size-3.5" /> {s.durationMin} min
               </div>
-              <div className="mt-4 text-lg font-semibold text-[color:var(--site-accent)]">
+              <div className="mt-2 text-base font-semibold text-[color:var(--site-accent)]">
                 {formatLei(s.priceLei)}
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="mt-8 divide-y divide-[color:var(--site-border)]">
+        <div className="mt-5 divide-y divide-[color:var(--site-border)]">
           {studio.services.map((s) => (
-            <div key={s.id} className="flex items-center justify-between gap-4 py-4">
+            <div key={s.id} className="flex items-center justify-between gap-4 py-3">
               <div>
                 <div className="font-medium">{s.name}</div>
                 <div className="mt-0.5 flex items-center gap-1.5 text-sm text-[color:var(--site-fg-muted)]">
@@ -327,28 +322,27 @@ function Gallery({ variant, ctx }: { variant: string; ctx: Ctx }) {
 
   if (variant === 'strip') {
     return (
-      <section className="py-[var(--site-section-y)]">
-        <div className="mx-auto mb-6 w-full max-w-3xl px-6 sm:px-10">
-          <Eyebrow ctx={ctx}>Portfolio</Eyebrow>
-        </div>
-        <div className="flex snap-x gap-[var(--site-gap)] overflow-x-auto px-6 pb-2 sm:px-10">
+      <Shell>
+        <Eyebrow ctx={ctx}>Portfolio</Eyebrow>
+        {/* Scrolls inside the centred column so it lines up with About. */}
+        <div className="mt-4 flex snap-x gap-[var(--site-gap)] overflow-x-auto pb-2">
           {tall.map((src) => (
             <img
               key={src}
               src={src}
               alt=""
-              className="h-72 w-56 shrink-0 snap-start rounded-[var(--site-radius)] object-cover sm:h-96 sm:w-72"
+              className="h-56 w-44 shrink-0 snap-start rounded-[var(--site-radius)] object-cover sm:h-72 sm:w-56"
             />
           ))}
         </div>
-      </section>
+      </Shell>
     );
   }
 
   return (
     <Shell>
       <Eyebrow ctx={ctx}>Portfolio</Eyebrow>
-      <div className="mt-6 grid grid-cols-2 gap-[var(--site-gap)] sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-3 gap-[var(--site-gap)] sm:grid-cols-4">
         {square.map((src) => (
           <img
             key={src}
@@ -373,24 +367,22 @@ function Reviews({ ctx }: { ctx: Ctx }) {
   return (
     <Shell className="bg-[var(--site-surface)]">
       <Eyebrow ctx={ctx}>Reviews</Eyebrow>
-      <div className="mt-4 flex items-baseline gap-3">
+      <div className="mt-3 flex items-baseline gap-3">
         <span
           style={{ fontFamily: 'var(--site-display-font)' }}
-          className={cn('text-5xl', ctx.preset.headingClass)}
+          className={cn('text-4xl', ctx.preset.headingClass)}
         >
           {studio.rating.toFixed(1)}
         </span>
-        <span className="text-[color:var(--site-fg-muted)]">
-          {studio.reviewCount} reviews
-        </span>
+        <span className="text-[color:var(--site-fg-muted)]">{studio.reviewCount} reviews</span>
       </div>
 
       {featured.length > 0 ? (
-        <div className="mt-8 grid gap-[var(--site-gap)] sm:grid-cols-2">
+        <div className="mt-5 grid gap-[var(--site-gap)] sm:grid-cols-2">
           {featured.map((r) => (
             <figure
               key={r.id}
-              className="rounded-[var(--site-radius)] border border-[color:var(--site-border)] bg-[var(--site-bg)] p-5"
+              className="rounded-[var(--site-radius)] border border-[color:var(--site-border)] bg-[var(--site-bg)] p-4"
             >
               <Quote className="size-5 text-[color:var(--site-accent)]" />
               <blockquote className="mt-3 leading-relaxed">{r.body}</blockquote>
@@ -438,9 +430,9 @@ function Hours({ ctx }: { ctx: Ctx }) {
   return (
     <Shell>
       <Eyebrow ctx={ctx}>Hours</Eyebrow>
-      <dl className="mt-6 divide-y divide-[color:var(--site-border)]">
+      <dl className="mt-4 divide-y divide-[color:var(--site-border)]">
         {rows.map(([day, time]) => (
-          <div key={day} className="flex items-center justify-between py-3">
+          <div key={day} className="flex items-center justify-between py-2">
             <dt className="font-medium">{day}</dt>
             <dd className="text-[color:var(--site-fg-muted)]">{time}</dd>
           </div>
@@ -458,17 +450,17 @@ function Cta({ ctx }: { ctx: Ctx }) {
   const { studio, locale } = ctx;
   return (
     <Shell>
-      <div className="rounded-[var(--site-radius)] bg-[var(--site-accent)] px-8 py-[var(--site-section-y)] text-center text-[color:var(--site-accent-fg)]">
-        <Display ctx={ctx} className="text-3xl sm:text-4xl">
+      <div className="rounded-[var(--site-radius)] bg-[var(--site-accent)] px-6 py-8 text-center text-[color:var(--site-accent-fg)]">
+        <Display ctx={ctx} className="text-2xl sm:text-3xl">
           Ready when you are
         </Display>
-        <p className="mx-auto mt-3 max-w-md opacity-90">
+        <p className="mx-auto mt-2 max-w-md text-sm opacity-90">
           Book {studio.name} in a few taps — pick a service and a time.
         </p>
         <Link
           href={`/studio/${studio.id}/book`}
           locale={locale}
-          className="mt-6 inline-flex items-center gap-2 rounded-[var(--site-radius)] bg-[var(--site-bg)] px-6 py-3 font-medium text-[color:var(--site-fg)]"
+          className="mt-4 inline-flex items-center gap-2 rounded-[var(--site-radius)] bg-[var(--site-bg)] px-6 py-3 font-medium text-[color:var(--site-fg)]"
         >
           Book now
           <ArrowRight className="size-4" />
