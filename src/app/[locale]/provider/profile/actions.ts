@@ -47,9 +47,13 @@ export async function saveProfileAction(
   // to roughly one per studio, as their usage policy requires.
   const { data: current } = await supabase
     .from('studios')
-    .select('address, city, lat, lng')
+    .select('address, city, lat, lng, location_source')
     .eq('provider_id', user.id)
     .maybeSingle();
+
+  // A pin the expert placed by hand outranks the geocoder — otherwise fixing a
+  // typo in the address would silently drag their pin somewhere else.
+  const pinnedByHand = current?.location_source === 'manual';
 
   const addressChanged =
     (current?.address ?? '') !== address || (current?.city ?? '') !== city;
@@ -58,7 +62,9 @@ export async function saveProfileAction(
   let coords: { lat: number; lng: number } | null = null;
   let located: ProfileState['located'] = 'unchanged';
 
-  if (!address) {
+  if (pinnedByHand) {
+    located = 'pinned';
+  } else if (!address) {
     located = 'no-address';
   } else if (addressChanged || needsCoords) {
     const hit = await geocodeAddress(address, city);
@@ -83,8 +89,13 @@ export async function saveProfileAction(
       bio: bio || null,
       known_for: knownFor,
       is_published: isPublished,
-      // Clearing the address clears the pin, so we never show a stale location.
-      ...(coords ? coords : addressChanged && !address ? { lat: null, lng: null } : {}),
+      // Clearing the address clears the pin, so we never show a stale
+      // location — unless the expert placed that pin themselves.
+      ...(coords
+        ? { ...coords, location_source: 'geocoded' as const }
+        : !pinnedByHand && addressChanged && !address
+          ? { lat: null, lng: null, location_source: null }
+          : {}),
     })
     .eq('provider_id', user.id);
 

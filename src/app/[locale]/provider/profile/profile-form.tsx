@@ -11,6 +11,7 @@ import type { StudioRow } from '@/lib/provider-studio';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { saveProfileAction, type ProfileState } from './actions';
+import { PlacePinButton } from './place-pin-button';
 
 const initialState: ProfileState = {};
 
@@ -73,9 +74,11 @@ export function ProfileForm({ studio, locale }: { studio: StudioRow; locale: str
       </div>
 
       <p className="-mt-2 text-xs text-muted-foreground">
-        Include the street name and number — that&rsquo;s what places your pin on the map.
-        Without it you&rsquo;ll still appear in search, just not on the map.
+        We&rsquo;ll try to find your address on the map. If it lands in the wrong spot — or
+        isn&rsquo;t found at all — place the pin yourself.
       </p>
+
+      <PlacePinButton locale={locale} hasPin={studio.lat != null && studio.lng != null} />
 
       <Field label="About">
         <textarea

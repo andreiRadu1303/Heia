@@ -4,6 +4,7 @@ import * as React from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import type { Map as MlMap, Marker as MlMarker } from 'maplibre-gl';
 
+import { loadMapLibre, MAP_STYLE_URL } from '@/lib/maplibre-loader';
 import { MAP_RESULTS } from '@/lib/preview-mock-data';
 import { cn } from '@/lib/utils';
 
@@ -11,15 +12,6 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 /** Bucharest centre. */
 const CENTER = { lat: 44.4268, lng: 26.1025 };
-
-/**
- * OpenFreeMap — free public instance of OpenStreetMap vector tiles.
- * No API key, no registration, no request limits, commercial use allowed.
- * Attribution is added automatically by MapLibre. If we ever want zero
- * third-party calls, this URL is the only thing that changes (swap for a
- * self-hosted PMTiles file).
- */
-const STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
 
 /**
  * Default markers for the preview-map pages — derived from MAP_RESULTS
@@ -78,19 +70,13 @@ export function MapBase<T extends BaseMarker = MapPin>({
 
     (async () => {
       if (!containerRef.current || mapRef.current) return;
-      const maplibregl = await import('maplibre-gl');
+      const maplibregl = await loadMapLibre();
       if (cancelled || !containerRef.current) return;
       libRef.current = maplibregl;
 
-      // MapLibre derives its worker URL from `import.meta.url`, which Next.js
-      // rewrites to a path that 404s to HTML — the browser then refuses it for
-      // having a non-JS MIME type and the map never starts. We serve our own
-      // copy from /public instead (see scripts/copy-maplibre-worker.mjs).
-      maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.js');
-
       const map = new maplibregl.Map({
         container: containerRef.current,
-        style: STYLE_URL,
+        style: MAP_STYLE_URL,
         center: [startLng, startLat],
         zoom: defaultZoom,
         attributionControl: { compact: true },

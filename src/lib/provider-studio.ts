@@ -13,6 +13,8 @@ export interface StudioRow {
   bio: string | null;
   city: string | null;
   address: string | null;
+  lat: number | null;
+  lng: number | null;
   known_for: string[];
   price_from_lei: number;
   rating: number;
@@ -31,7 +33,7 @@ export interface StudioRow {
 }
 
 const STUDIO_COLUMNS =
-  'id, slug, name, category_id, tagline, bio, city, address, known_for, price_from_lei, rating, review_count, is_published, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls, site_config, onboarded_at, stripe_account_id, stripe_charges_enabled';
+  'id, slug, name, category_id, tagline, bio, city, address, lat, lng, known_for, price_from_lei, rating, review_count, is_published, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls, site_config, onboarded_at, stripe_account_id, stripe_charges_enabled';
 
 /**
  * The signed-in expert's own studio (created for them at signup). Returns null
