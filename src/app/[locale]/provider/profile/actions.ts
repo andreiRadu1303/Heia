@@ -9,7 +9,7 @@ export interface ProfileState {
   ok?: boolean;
   error?: string;
   /** How the address fared on the map, so the form can tell the expert. */
-  located?: 'pinned' | 'not-found' | 'no-address' | 'unchanged';
+  located?: 'pinned' | 'not-found' | 'no-address' | 'unchanged' | 'stale-manual';
 }
 
 /**
@@ -63,7 +63,9 @@ export async function saveProfileAction(
   let located: ProfileState['located'] = 'unchanged';
 
   if (pinnedByHand) {
-    located = 'pinned';
+    // Their pin stays put — but if the address moved, it's now pointing at the
+    // old place and they need to know, because nothing on screen would show it.
+    located = addressChanged ? 'stale-manual' : 'pinned';
   } else if (!address) {
     located = 'no-address';
   } else if (addressChanged || needsCoords) {

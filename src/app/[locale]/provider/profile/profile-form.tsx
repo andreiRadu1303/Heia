@@ -78,7 +78,12 @@ export function ProfileForm({ studio, locale }: { studio: StudioRow; locale: str
         isn&rsquo;t found at all — place the pin yourself.
       </p>
 
-      <PlacePinButton locale={locale} hasPin={studio.lat != null && studio.lng != null} />
+      <PlacePinButton
+        locale={locale}
+        stale={state.located === 'stale-manual'}
+        hasPin={studio.lat != null && studio.lng != null}
+        isManual={studio.location_source === 'manual'}
+      />
 
       <Field label="About">
         <textarea
