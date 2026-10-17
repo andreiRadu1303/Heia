@@ -1,16 +1,17 @@
 'use client';
 
-import { Home, CalendarDays, Scissors, User, LayoutTemplate } from 'lucide-react';
+import { Home, CalendarDays, Scissors, User, LayoutTemplate, BarChart3 } from 'lucide-react';
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
-// Five primary tabs; Hours lives on the Home "Manage" grid to keep this uncramped.
+// Six primary tabs; Hours and Payments live on the Home "Manage" grid.
 const TABS = [
   { href: '/provider', label: 'Home', icon: Home, exact: true },
   { href: '/provider/bookings', label: 'Bookings', icon: CalendarDays },
   { href: '/provider/services', label: 'Services', icon: Scissors },
   { href: '/provider/site', label: 'Site', icon: LayoutTemplate },
+  { href: '/provider/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/provider/profile', label: 'Profile', icon: User },
 ];
 
@@ -22,7 +23,7 @@ export function ProviderNav() {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
       aria-label="Provider"
     >
-      <div className="mx-auto grid max-w-lg grid-cols-5">
+      <div className="mx-auto grid max-w-lg grid-cols-6">
         {TABS.map(({ href, label, icon: Icon, exact }) => {
           const active = exact ? pathname === href : pathname.startsWith(href);
           return (

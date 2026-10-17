@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import typography from '@tailwindcss/typography';
 
 const config: Config = {
   darkMode: ['class'],
@@ -57,7 +58,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  // `import`, not `require`: Node ≥ 22.18 loads this .ts config as an ES
+  // module, where `require` is undefined and would crash CSS compilation.
+  plugins: [typography],
 };
 
 export default config;
