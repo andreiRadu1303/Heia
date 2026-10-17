@@ -1,21 +1,6 @@
 import { redirect } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
-import {
-  Star,
-  MessageSquareText,
-  Scissors,
-  Clock,
-  CalendarDays,
-  LayoutTemplate,
-  User,
-  ArrowUpRight,
-  ExternalLink,
-  Globe,
-  EyeOff,
-  CreditCard,
-  Bell,
-  CalendarPlus,
-} from 'lucide-react';
+import { Star, MessageSquareText, Scissors, Clock, CalendarDays, LayoutTemplate, User, ArrowUpRight, ExternalLink, Globe, EyeOff, CreditCard, Bell, CalendarPlus, Store } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { Link } from '@/i18n/navigation';
@@ -105,11 +90,11 @@ export default async function ProviderHome({
               <div className="text-sm text-muted-foreground">
                 {studio.is_published
                   ? 'Clients can find and book you.'
-                  : 'Only you can see it. Publish it from your profile.'}
+                  : 'Only you can see it. Publish it from your studio page.'}
               </div>
             </div>
             <Link
-              href="/provider/profile"
+              href="/provider/studio"
               className="shrink-0 text-sm font-medium text-foreground underline-offset-4 hover:underline"
             >
               {studio.is_published ? 'Edit' : 'Publish'}
@@ -172,9 +157,10 @@ export default async function ProviderHome({
           <section>
             <h2 className="mb-4 text-xl font-medium tracking-tight">Manage</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              <ManageCard href="/provider/profile" icon={<User className="size-5" />} title="Studio profile" hint="Name, bio, publish" />
+              <ManageCard href="/provider/studio" icon={<Store className="size-5" />} title="Studio" hint="Name, bio, location, publish" />
               <ManageCard href="/provider/services" icon={<Scissors className="size-5" />} title="Services" hint={`${serviceCount} listed`} />
               <ManageCard href="/provider/site" icon={<LayoutTemplate className="size-5" />} title="Mini-site" hint="Design your page" />
+              <ManageCard href="/provider/profile" icon={<User className="size-5" />} title="Account" hint="Name, email, password" />
               <ManageCard href="/provider/availability" icon={<Clock className="size-5" />} title="Hours" hint="Your weekly schedule" />
               <ManageCard href="/provider/bookings" icon={<CalendarDays className="size-5" />} title="Bookings" hint="Requests & schedule" />
               <ManageCard href="/provider/payments" icon={<CreditCard className="size-5" />} title="Payments" hint="Payouts & plan" />

@@ -8,8 +8,7 @@ import { ClientNav } from '@/components/app/client-nav';
 import { Button } from '@/components/ui/button';
 import { reconcilePaidSession } from '@/lib/payments-server';
 import { logoutAction } from '../dashboard/actions';
-import { AccountCard, type AccountProfile } from './account-card';
-import { PasswordCard } from './password-card';
+import { AccountSettings } from '@/components/app/account-settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,25 +64,7 @@ export default async function AccountPage({
           </div>
         ) : null}
 
-        <section>
-          <AccountCard
-            email={user.email ?? ''}
-            locale={locale}
-            profile={{
-              display_name: profile?.display_name ?? '',
-              role: (profile?.role as AccountProfile['role']) ?? null,
-              marketing_consent: profile?.marketing_consent ?? false,
-              created_at: profile?.created_at ?? null,
-              avatar_url: profile?.avatar_url ?? null,
-              city: cityRow?.city ?? null,
-              phone: phoneRow?.phone ?? null,
-            }}
-          />
-        </section>
-
-        <section>
-          <PasswordCard locale={locale} openByDefault={sp.reset === '1'} />
-        </section>
+        <AccountSettings locale={locale} openPassword={sp.reset === '1'} />
 
         <form action={logoutAction}>
           <input type="hidden" name="locale" value={locale} />

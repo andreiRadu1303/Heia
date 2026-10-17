@@ -162,6 +162,62 @@ export async function changePasswordAction(
 }
 
 /**
+ * Start an email change.
+ *
+ * Supabase does NOT switch the address immediately: it emails a confirmation
+ * link to the new one, and the change only lands once that link is clicked.
+ * That's deliberate — a typo would otherwise lock someone out of their own
+ * account — so the UI has to say "check your inbox", not "done".
+ */
+export async function changeEmailAction(
+  _prev: AccountState,
+  formData: FormData,
+): Promise<AccountState> {
+  const email = String(formData.get('email') ?? '').trim().toLowerCase();
+  const confirm = String(formData.get('confirm_email') ?? '').trim().toLowerCase();
+
+  if (!email) return { error: 'Enter your new email address.' };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: 'That does not look like a valid email address.' };
+  }
+  // Typing it twice is the cheapest guard against locking yourself out.
+  if (email !== confirm) return { error: 'The two email addresses do not match.' };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: 'You are signed out. Please sign in again.' };
+
+  if (user.email?.toLowerCase() === email) {
+    return { error: 'That is already your email address.' };
+  }
+
+  const origin = (await headers()).get('origin') ?? '';
+  const { error } = await supabase.auth.updateUser(
+    { email },
+    { emailRedirectTo: origin ? `${origin}/auth/confirm` : undefined },
+  );
+
+  if (error) {
+    console.error('changeEmailAction failed', error);
+    const msg = error.message.toLowerCase();
+    if (msg.includes('already') || msg.includes('registered') || msg.includes('exists')) {
+      return { error: 'That email is already used by another account.' };
+    }
+    if (msg.includes('reauthentication') || msg.includes('nonce')) {
+      return { error: 'For security, sign out and back in, then try again.' };
+    }
+    if (msg.includes('rate') || msg.includes('too many')) {
+      return { error: 'Too many attempts. Please wait a few minutes and try again.' };
+    }
+    return { error: 'Could not start the email change. Please try again.' };
+  }
+
+  return { ok: true };
+}
+
+/**
  * Email the signed-in user a password reset link. The link lands on
  * /auth/confirm, which starts a session and sends them back to the account
  * page with the change-password form open.

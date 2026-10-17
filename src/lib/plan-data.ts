@@ -155,7 +155,7 @@ export const SITEMAP: SiteNode[] = [
       { path: '/provider/bookings', label: 'Incoming bookings', tag: 'provider' },
       { path: '/provider/services', label: 'Manage services', tag: 'provider' },
       { path: '/provider/availability', label: 'Weekly hours', tag: 'provider' },
-      { path: '/provider/profile', label: 'Edit studio profile', tag: 'provider' },
+      { path: '/provider/studio', label: 'Edit studio profile', tag: 'provider' },
     ],
   },
   { path: '/preview/play', label: 'Design playground (12 palettes × 6 styles)', tag: 'shared' },

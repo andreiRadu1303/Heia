@@ -1,57 +1,63 @@
 import { setRequestLocale } from 'next-intl/server';
-import { ExternalLink } from 'lucide-react';
+import { Store, ChevronRight } from 'lucide-react';
 
 import { Link } from '@/i18n/navigation';
-import { getMyStudio } from '@/lib/provider-studio';
-import { StudioMediaEditor } from '@/components/media/studio-media';
-import { ProfileForm } from './profile-form';
+import { Button } from '@/components/ui/button';
+import { AccountSettings } from '@/components/app/account-settings';
+import { logoutAction } from '@/app/[locale]/(app)/dashboard/actions';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * The expert's own account — name, photo, email, password.
+ * Their studio (what clients see) is a separate thing, under Studio.
+ */
 export default async function ProviderProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ reset?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-
-  const studio = await getMyStudio();
+  const sp = await searchParams;
 
   return (
     <main className="container max-w-2xl space-y-6 pt-8">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Studio profile</h1>
-          <p className="mt-2 text-muted-foreground">How clients see you on Heia.</p>
-        </div>
-        {studio ? (
-          <Link
-            href={`/studio/${studio.slug}`}
-            target="_blank"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-secondary"
-          >
-            <ExternalLink className="size-4" /> View as client
-          </Link>
-        ) : null}
+      <header>
+        <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">Profile</h1>
+        <p className="mt-2 text-muted-foreground">Your account details and sign-in.</p>
       </header>
 
-      {studio ? (
-        <>
-          <StudioMediaEditor
-            locale={locale}
-            initialAvatar={studio.avatar_url}
-            initialCover={studio.cover_url}
-            initialGallery={studio.gallery_urls}
-          />
-          <ProfileForm studio={studio} locale={locale} />
-        </>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-border bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
-          We couldn’t find a studio for your account. If you just signed up, try reloading. If this
-          persists, your account may not be set up as a specialist.
+      <AccountSettings locale={locale} openPassword={sp.reset === '1'} />
+
+      {/* Easy to look for studio details here, so point the way. */}
+      <Link
+        href="/provider/studio"
+        className="flex items-center gap-3 rounded-2xl bg-card p-4 ring-1 ring-border transition-colors hover:bg-secondary/40"
+      >
+        <div
+          className="grid size-10 shrink-0 place-items-center rounded-full text-accent"
+          style={{ background: 'hsl(var(--accent) / 0.15)' }}
+        >
+          <Store className="size-5" />
         </div>
-      )}
+        <div className="min-w-0 flex-1">
+          <div className="font-medium">Studio details</div>
+          <div className="text-sm text-muted-foreground">
+            Your public page, photos, location and mini-site.
+          </div>
+        </div>
+        <ChevronRight className="size-5 shrink-0 text-muted-foreground" />
+      </Link>
+
+      <form action={logoutAction}>
+        <input type="hidden" name="locale" value={locale} />
+        <Button type="submit" variant="outline" className="w-full">
+          Sign out
+        </Button>
+      </form>
     </main>
   );
 }

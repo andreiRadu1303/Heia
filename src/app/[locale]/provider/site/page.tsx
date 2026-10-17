@@ -1,4 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
+import { ChevronLeft } from 'lucide-react';
+
+import { Link } from '@/i18n/navigation';
 
 import { studioById, MY_STUDIO_ID } from '@/lib/app-mock-data';
 import { getMyStudio } from '@/lib/provider-studio';
@@ -38,5 +41,19 @@ export default async function ProviderSitePage({
     if (real) studio = real;
   }
 
-  return <SiteBuilder studio={studio} locale={locale} initialConfig={initialConfig} />;
+  return (
+    <>
+      {/* The mini-site is a sub-page of Studio now, so offer the way back —
+          the bottom nav no longer points here. */}
+      <div className="container max-w-5xl pt-4">
+        <Link
+          href="/provider/studio"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft className="size-4" /> Back to Studio
+        </Link>
+      </div>
+      <SiteBuilder studio={studio} locale={locale} initialConfig={initialConfig} />
+    </>
+  );
 }

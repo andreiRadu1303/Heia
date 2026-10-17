@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, CalendarDays, Scissors, User, LayoutTemplate, BarChart3 } from 'lucide-react';
+import { Home, CalendarDays, Scissors, User, Store, BarChart3 } from 'lucide-react';
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -10,7 +10,7 @@ const TABS = [
   { href: '/provider', label: 'Home', icon: Home, exact: true },
   { href: '/provider/bookings', label: 'Bookings', icon: CalendarDays },
   { href: '/provider/services', label: 'Services', icon: Scissors },
-  { href: '/provider/site', label: 'Site', icon: LayoutTemplate },
+  { href: '/provider/studio', label: 'Studio', icon: Store },
   { href: '/provider/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/provider/profile', label: 'Profile', icon: User },
 ];
