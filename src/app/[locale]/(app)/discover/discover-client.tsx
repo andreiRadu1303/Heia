@@ -44,7 +44,8 @@ export function DiscoverClient({
                   : 'bg-card text-foreground ring-1 ring-border',
               )}
             >
-              {s.priceFromLei === 0 ? 'Free' : `${s.priceFromLei} lei`}
+              {/* No price yet (no services listed) → show the name, not "Free". */}
+              {s.priceFromLei > 0 ? `${s.priceFromLei} lei` : s.name.split(/[\s·]/)[0]}
             </div>
           );
         }}
