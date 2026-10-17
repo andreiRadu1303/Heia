@@ -82,10 +82,11 @@ export function MapBase<T extends BaseMarker = MapPin>({
       if (cancelled || !containerRef.current) return;
       libRef.current = maplibregl;
 
-      // Next's bundler doesn't emit MapLibre's `new URL(...)` worker, so the
-      // default worker URL 404s and the map stays blank. Serve our own copy
-      // (public/, kept in sync by scripts/copy-maplibre-worker.js).
-      maplibregl.setWorkerUrl('/maplibre-gl-worker.mjs');
+      // MapLibre derives its worker URL from `import.meta.url`, which Next.js
+      // rewrites to a path that 404s to HTML — the browser then refuses it for
+      // having a non-JS MIME type and the map never starts. We serve our own
+      // copy from /public instead (see scripts/copy-maplibre-worker.mjs).
+      maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.js');
 
       const map = new maplibregl.Map({
         container: containerRef.current,
@@ -156,10 +157,10 @@ export function MapBase<T extends BaseMarker = MapPin>({
 
   return (
     <div className={cn('relative overflow-hidden bg-secondary/40', className)}>
-      {/* size-full is required: maplibre-gl.css forces `.maplibregl-map` to
-          position: relative, which defeats `absolute inset-0` and collapses
-          the height to 0 (blank map). */}
-      <div ref={containerRef} className="absolute inset-0 size-full" />
+      {/* size-full, not `absolute inset-0`: MapLibre's stylesheet forces
+          `position: relative` on its container, which cancels inset-based
+          sizing and collapses the map to zero height. */}
+      <div ref={containerRef} className="size-full" />
     </div>
   );
 }
