@@ -27,15 +27,14 @@ async function studioIdBySlug(
 /** All reviews for a studio (by slug), newest first, mapped for the UI. */
 export async function getStudioReviewsBySlug(slug: string): Promise<Review[]> {
   const supabase = await createClient();
-  const studioId = await studioIdBySlug(supabase, slug);
-  if (!studioId) return [];
 
+  // Filter through the studios join so this is one round trip, not two.
   const { data: rows } = await supabase
     .from('reviews')
     .select(
-      'id, studio_id, booking_id, author_id, score_quality, score_cleanliness, score_value, recommend, would_return, tags, body, created_at',
+      'id, studio_id, booking_id, author_id, score_quality, score_cleanliness, score_value, recommend, would_return, tags, body, created_at, studios!inner(slug)',
     )
-    .eq('studio_id', studioId)
+    .eq('studios.slug', slug)
     .order('created_at', { ascending: false });
 
   const reviews = (rows ?? []) as ReviewRow[];

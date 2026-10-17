@@ -57,22 +57,25 @@ interface ServiceRow {
 export async function getPublicStudioBySlug(slug: string): Promise<Studio | null> {
   const supabase = await createClient();
 
-  const { data: row } = await supabase
-    .from('studios')
-    .select(
-      'id, slug, name, category_id, tagline, bio, city, address, lat, lng, known_for, price_from_lei, rating, review_count, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls, site_config',
-    )
-    .eq('slug', slug)
-    .maybeSingle();
+  // Studio and its services in parallel (services filtered via the join), so
+  // the page waits for one round trip instead of two.
+  const [{ data: row }, { data: svcRows }] = await Promise.all([
+    supabase
+      .from('studios')
+      .select(
+        'id, slug, name, category_id, tagline, bio, city, address, lat, lng, known_for, price_from_lei, rating, review_count, hero_seed, avatar_seed, gallery_seeds, avatar_url, cover_url, gallery_urls, site_config',
+      )
+      .eq('slug', slug)
+      .maybeSingle(),
+    supabase
+      .from('services')
+      .select('id, name, duration_min, price_lei, studios!inner(slug)')
+      .eq('studios.slug', slug)
+      .order('sort_order', { ascending: true }),
+  ]);
 
   if (!row) return null;
   const studio = row as PublicStudioRow;
-
-  const { data: svcRows } = await supabase
-    .from('services')
-    .select('id, name, duration_min, price_lei')
-    .eq('studio_id', studio.id)
-    .order('sort_order', { ascending: true });
 
   const services: ServiceOffering[] = ((svcRows ?? []) as ServiceRow[]).map((s) => ({
     id: s.id,

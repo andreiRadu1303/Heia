@@ -23,45 +23,39 @@ export default async function ClientHome({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('display_name, role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (profile?.role === 'provider') redirect(`/${locale}/provider`);
-
-  // Separate query so a not-yet-applied migration 011 only loses the city,
-  // not the whole profile (see QA log B6).
-  const { data: cityRow } = await supabase
-    .from('profiles')
-    .select('city')
-    .eq('id', user.id)
-    .maybeSingle();
-  const city = resolveCity(cityRow?.city);
-
-  // Real published studios; distance is measured from the chosen city's
-  // centre (addresses aren't geocoded yet, see discover-server.ts).
-  const studios = (await getPublishedStudios()).map((s) => ({
-    ...s,
-    distanceKm: distanceKm(city, s),
-  }));
-
-  // The client's next upcoming visit (RLS limits rows to their own bookings).
   // `scheduled_at` is stored as a naive local datetime, so compare against a
   // local "now" formatted the same way.
   const now = new Date();
   const nowLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
     .toISOString()
     .slice(0, 19);
-  const { data: nextRow } = await supabase
-    .from('bookings')
-    .select('id, scheduled_at, service_name, status, studios(slug, name, hero_seed, cover_url)')
-    .in('status', ['pending', 'confirmed'])
-    .gte('scheduled_at', nowLocal)
-    .order('scheduled_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+
+  // All four reads are independent → one round trip's wait, not four.
+  // City is its own query so a not-yet-applied migration 011 only loses the
+  // city, not the whole profile (see QA log B6).
+  const [{ data: profile }, { data: cityRow }, publishedStudios, { data: nextRow }] =
+    await Promise.all([
+      supabase.from('profiles').select('display_name, role').eq('id', user.id).maybeSingle(),
+      supabase.from('profiles').select('city').eq('id', user.id).maybeSingle(),
+      getPublishedStudios(),
+      // The client's next upcoming visit (RLS limits rows to their own bookings).
+      supabase
+        .from('bookings')
+        .select('id, scheduled_at, service_name, status, studios(slug, name, hero_seed, cover_url)')
+        .in('status', ['pending', 'confirmed'])
+        .gte('scheduled_at', nowLocal)
+        .order('scheduled_at', { ascending: true })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+  if (profile?.role === 'provider') redirect(`/${locale}/provider`);
+
+  const city = resolveCity(cityRow?.city);
+
+  // Distance is measured from the chosen city's centre (addresses aren't
+  // geocoded yet, see discover-server.ts).
+  const studios = publishedStudios.map((s) => ({ ...s, distanceKm: distanceKm(city, s) }));
 
   const next = nextRow as unknown as NextBookingRow | null;
   const nextBooking: NextBooking | null = next

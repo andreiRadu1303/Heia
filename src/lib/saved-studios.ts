@@ -2,13 +2,18 @@ import { createClient } from '@/lib/supabase/server';
 import { STUDIO_LIST_COLUMNS, mapStudioRow, type StudioListRow } from '@/lib/discover-server';
 import type { Studio } from '@/lib/app-mock-data';
 
-/** Whether the signed-in user has saved the studio with this slug. */
-export async function isStudioSaved(slug: string): Promise<boolean> {
+/**
+ * Whether the signed-in user has saved the studio with this slug. Pass
+ * `userId` when the caller already resolved the session to skip a round trip.
+ */
+export async function isStudioSaved(slug: string, userId?: string): Promise<boolean> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return false;
+  if (!userId) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return false;
+  }
 
   // RLS limits rows to the user's own saves, so matching the slug is enough.
   const { data } = await supabase

@@ -35,15 +35,14 @@ export default async function AccountPage({
   } = await supabase.auth.getUser();
   if (!user) redirect(`/${locale}/login`);
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('display_name, role, marketing_consent, created_at, avatar_url')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  // Separate queries so a not-yet-applied migration (011 city, 013 phone)
-  // only loses that one field.
-  const [{ data: cityRow }, { data: phoneRow }] = await Promise.all([
+  // One parallel batch. City and phone are separate queries so a
+  // not-yet-applied migration (011 city, 013 phone) only loses that one field.
+  const [{ data: profile }, { data: cityRow }, { data: phoneRow }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('display_name, role, marketing_consent, created_at, avatar_url')
+      .eq('id', user.id)
+      .maybeSingle(),
     supabase.from('profiles').select('city').eq('id', user.id).maybeSingle(),
     supabase.from('profiles').select('phone').eq('id', user.id).maybeSingle(),
   ]);

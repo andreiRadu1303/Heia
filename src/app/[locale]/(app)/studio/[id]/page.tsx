@@ -28,22 +28,29 @@ export default async function StudioPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
 
+  // Everything independent runs in parallel: the page waits for the slowest
+  // round trip rather than the sum of them.
+  const supabase = await createClient();
+  const [realStudio, reviews, authResult] = await Promise.all([
+    getPublicStudioBySlug(id),
+    getStudioReviewsBySlug(id),
+    supabase.auth.getUser(),
+  ]);
+  const user = authResult.data.user;
+
   // Real studio first (by slug), falling back to the seeded demo studios.
-  const studio = (await getPublicStudioBySlug(id)) ?? studioById(id);
+  const studio = realStudio ?? studioById(id);
   if (!studio) notFound();
   const category = categoryById(studio.categoryId);
-  const reviews = await getStudioReviewsBySlug(id);
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const saved = user ? await isStudioSaved(id) : false;
+  const [saved, hours] = await Promise.all([
+    user ? isStudioSaved(id, user.id) : Promise.resolve(false),
+    studio.siteConfig && studio.dbId ? getStudioHours(studio.dbId) : Promise.resolve(undefined),
+  ]);
 
   // Expert designed a mini-site → render that instead of the generic layout.
   // Content (name, services, photos, reviews, hours) is still the real data.
   if (studio.siteConfig && studio.dbId) {
-    const hours = await getStudioHours(studio.dbId);
     const siteStudio = { ...studio, reviews: reviews.map(toSiteReview) };
     return (
       <div className="min-h-dvh pb-24">
