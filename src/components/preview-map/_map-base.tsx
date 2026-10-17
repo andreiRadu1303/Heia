@@ -157,7 +157,10 @@ export function MapBase<T extends BaseMarker = MapPin>({
 
   return (
     <div className={cn('relative overflow-hidden bg-secondary/40', className)}>
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* size-full, not `absolute inset-0`: MapLibre's stylesheet forces
+          `position: relative` on its container, which cancels inset-based
+          sizing and collapses the map to zero height. */}
+      <div ref={containerRef} className="size-full" />
     </div>
   );
 }
