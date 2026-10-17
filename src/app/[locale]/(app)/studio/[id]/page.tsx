@@ -47,7 +47,7 @@ export default async function StudioPage({
     const siteStudio = { ...studio, reviews: reviews.map(toSiteReview) };
     return (
       <div className="min-h-dvh pb-24">
-        <AppTopBar title={studio.name} backHref={`/discover?category=${studio.categoryId}`} />
+        <AppTopBar title={studio.name} backHref={`/discover?category=${studio.categoryId}`} historyBack />
         <div className="relative">
           <SaveStudioButton
             slug={studio.id}
@@ -68,7 +68,7 @@ export default async function StudioPage({
 
   return (
     <div className="min-h-dvh pb-24">
-      <AppTopBar title={studio.name} backHref={`/discover?category=${studio.categoryId}`} />
+      <AppTopBar title={studio.name} backHref={`/discover?category=${studio.categoryId}`} historyBack />
 
       {/* Hero */}
       <div className="relative h-64 w-full overflow-hidden sm:h-80">
