@@ -9,7 +9,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "node scripts/copy-maplibre-worker.js",
     "docs:pdf": "cd tools/docs-build && node build-pdf.js"
   },
   "dependencies": {
