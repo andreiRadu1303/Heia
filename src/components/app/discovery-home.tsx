@@ -390,7 +390,7 @@ function StudioThumb({ studio, className }: { studio: Studio; className: string 
 function StudioRow({ studio }: { studio: Studio }) {
   return (
     <Link
-      href={`/discover?category=${studio.categoryId}&focus=${studio.id}`}
+      href={`/studio/${studio.id}`}
       className="flex items-center gap-3 rounded-3xl bg-card p-3 ring-1 ring-border transition-transform hover:-translate-y-0.5"
     >
       <StudioThumb studio={studio} className="size-20" />
