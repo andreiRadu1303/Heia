@@ -54,10 +54,14 @@ export function mapStudioRow(row: StudioListRow): Studio {
 }
 
 function mapRow(row: StudioListRow): Studio {
-  const point =
-    row.lat != null && row.lng != null
-      ? { lat: row.lat, lng: row.lng }
-      : fallbackPoint(row.id, row.city);
+  // A studio only gets a real pin once its address has been geocoded. The
+  // fallback jitter is kept for the city-level view, but `isLocated` lets the
+  // map leave un-geocoded studios off entirely — a guessed pin on a real street
+  // map points at a real building that isn't theirs, which is worse than none.
+  const isLocated = row.lat != null && row.lng != null;
+  const point = isLocated
+    ? { lat: row.lat as number, lng: row.lng as number }
+    : fallbackPoint(row.id, row.city);
   return {
     id: row.slug,
     name: row.name,
@@ -71,6 +75,7 @@ function mapRow(row: StudioListRow): Studio {
     distanceKm: 0,
     lat: point.lat,
     lng: point.lng,
+    isLocated,
     bio: row.bio ?? '',
     knownFor: row.known_for ?? [],
     services: [],

@@ -8,6 +8,8 @@ import { geocodeAddress } from '@/lib/geocode';
 export interface ProfileState {
   ok?: boolean;
   error?: string;
+  /** How the address fared on the map, so the form can tell the expert. */
+  located?: 'pinned' | 'not-found' | 'no-address' | 'unchanged';
 }
 
 /**
@@ -54,9 +56,20 @@ export async function saveProfileAction(
   const needsCoords = current?.lat == null || current?.lng == null;
 
   let coords: { lat: number; lng: number } | null = null;
-  if (address && (addressChanged || needsCoords)) {
+  let located: ProfileState['located'] = 'unchanged';
+
+  if (!address) {
+    located = 'no-address';
+  } else if (addressChanged || needsCoords) {
     const hit = await geocodeAddress(address, city);
-    if (hit) coords = { lat: hit.lat, lng: hit.lng };
+    if (hit) {
+      coords = { lat: hit.lat, lng: hit.lng };
+      located = 'pinned';
+    } else {
+      located = 'not-found';
+    }
+  } else {
+    located = 'pinned'; // already had coordinates and the address didn't change
   }
 
   const { error } = await supabase
@@ -82,5 +95,5 @@ export async function saveProfileAction(
 
   revalidatePath(`/${locale}/provider/profile`);
   revalidatePath(`/${locale}/provider`);
-  return { ok: true };
+  return { ok: true, located };
 }

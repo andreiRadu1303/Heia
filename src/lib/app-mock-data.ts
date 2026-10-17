@@ -153,6 +153,9 @@ export interface Studio {
   distanceKm: number;
   lat: number;
   lng: number;
+  /** True once the address has been geocoded — false means the coordinates
+   *  are a city-level guess and the studio shouldn't be pinned on a real map. */
+  isLocated?: boolean;
   bio: string;
   knownFor: string[];
   services: ServiceOffering[];

@@ -29,7 +29,10 @@ export function DiscoverClient({
   return (
     <div className="relative h-full">
       <MapBase
-        markers={ordered}
+        // Only studios with a geocoded address get a pin. The rest still show
+        // in the list below — a guessed pin on a real street map would point
+        // at someone else's building.
+        markers={ordered.filter((s) => s.isLocated)}
         center={focused ? { lat: focused.lat, lng: focused.lng } : undefined}
         defaultZoom={focused ? 15 : 14}
         className="absolute inset-0"

@@ -3,9 +3,10 @@
 import * as React from 'react';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { CheckCircle2, Globe } from 'lucide-react';
+import { CheckCircle2, Globe, MapPin } from 'lucide-react';
 
 import { CATEGORIES } from '@/lib/app-mock-data';
+import { CITIES } from '@/lib/cities';
 import type { StudioRow } from '@/lib/provider-studio';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -49,16 +50,32 @@ export function ProfileForm({ studio, locale }: { studio: StudioRow; locale: str
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="City">
-          <Input name="city" defaultValue={studio.city ?? ''} className="h-11 bg-card text-base" />
+          <select
+            name="city"
+            defaultValue={studio.city ?? 'București'}
+            className="h-11 w-full rounded-xl border border-input bg-card px-3 text-base"
+          >
+            {CITIES.map((c) => (
+              <option key={c.name} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
         </Field>
-        <Field label="Address">
+        <Field label="Street address">
           <Input
             name="address"
             defaultValue={studio.address ?? ''}
+            placeholder="Strada Lipscani 12"
             className="h-11 bg-card text-base"
           />
         </Field>
       </div>
+
+      <p className="-mt-2 text-xs text-muted-foreground">
+        Include the street name and number — that&rsquo;s what places your pin on the map.
+        Without it you&rsquo;ll still appear in search, just not on the map.
+      </p>
 
       <Field label="About">
         <textarea
@@ -107,8 +124,31 @@ export function ProfileForm({ studio, locale }: { studio: StudioRow; locale: str
       ) : null}
 
       {state.ok ? (
-        <div className="flex items-center gap-2 rounded-md border border-accent/40 bg-accent/10 px-3 py-2 text-sm text-accent">
-          <CheckCircle2 className="size-4" /> Saved.
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 rounded-md border border-accent/40 bg-accent/10 px-3 py-2 text-sm text-accent">
+            <CheckCircle2 className="size-4" /> Saved.
+          </div>
+
+          {/* Tell them plainly whether they ended up on the map — otherwise a
+              bad address fails silently and their pin sits somewhere wrong. */}
+          {state.located === 'pinned' ? (
+            <div className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+              <MapPin className="size-4 text-accent" /> You&rsquo;re on the map.
+            </div>
+          ) : state.located === 'not-found' ? (
+            <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              <MapPin className="mt-0.5 size-4 shrink-0" />
+              <span>
+                We couldn&rsquo;t find that address, so you won&rsquo;t show on the map yet.
+                Check the street name and number.
+              </span>
+            </div>
+          ) : state.located === 'no-address' ? (
+            <div className="flex items-start gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm text-muted-foreground">
+              <MapPin className="mt-0.5 size-4 shrink-0" />
+              <span>Add a street address to appear on the map.</span>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
