@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { createClient } from '@/lib/supabase/server';
+import { geocodeAddress } from '@/lib/geocode';
 
 export interface ProfileState {
   ok?: boolean;
@@ -40,6 +41,24 @@ export async function saveProfileAction(
   } = await supabase.auth.getUser();
   if (!user) return { error: 'You are signed out. Please sign in again.' };
 
+  // Only re-geocode when the address actually changed — keeps Nominatim calls
+  // to roughly one per studio, as their usage policy requires.
+  const { data: current } = await supabase
+    .from('studios')
+    .select('address, city, lat, lng')
+    .eq('provider_id', user.id)
+    .maybeSingle();
+
+  const addressChanged =
+    (current?.address ?? '') !== address || (current?.city ?? '') !== city;
+  const needsCoords = current?.lat == null || current?.lng == null;
+
+  let coords: { lat: number; lng: number } | null = null;
+  if (address && (addressChanged || needsCoords)) {
+    const hit = await geocodeAddress(address, city);
+    if (hit) coords = { lat: hit.lat, lng: hit.lng };
+  }
+
   const { error } = await supabase
     .from('studios')
     .update({
@@ -51,6 +70,8 @@ export async function saveProfileAction(
       bio: bio || null,
       known_for: knownFor,
       is_published: isPublished,
+      // Clearing the address clears the pin, so we never show a stale location.
+      ...(coords ? coords : addressChanged && !address ? { lat: null, lng: null } : {}),
     })
     .eq('provider_id', user.id);
 

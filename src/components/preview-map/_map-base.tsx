@@ -1,12 +1,25 @@
 'use client';
 
 import * as React from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import type { Map as MlMap, Marker as MlMarker } from 'maplibre-gl';
 
 import { MAP_RESULTS } from '@/lib/preview-mock-data';
 import { cn } from '@/lib/utils';
 
+import 'maplibre-gl/dist/maplibre-gl.css';
+
 /** Bucharest centre. */
 const CENTER = { lat: 44.4268, lng: 26.1025 };
+
+/**
+ * OpenFreeMap — free public instance of OpenStreetMap vector tiles.
+ * No API key, no registration, no request limits, commercial use allowed.
+ * Attribution is added automatically by MapLibre. If we ever want zero
+ * third-party calls, this URL is the only thing that changes (swap for a
+ * self-hosted PMTiles file).
+ */
+const STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
 
 /**
  * Default markers for the preview-map pages — derived from MAP_RESULTS
@@ -27,117 +40,118 @@ interface BaseMarker {
 }
 
 /**
- * Styled mockup map — no external provider, no API key. Pins are placed by
- * projecting each marker's lat/lng into the container (bounds-fit with padding).
- * The API is a drop-in replacement for the previous Google Maps component:
- * callers pass `markers` + a `renderPin` callback.
+ * Real OpenStreetMap map (MapLibre GL + OpenFreeMap tiles).
+ *
+ * Deliberately a drop-in replacement for the previous mockup component: the
+ * props are unchanged, so callers keep passing `markers` + `renderPin` and
+ * their pin design survives — each pin becomes an HTML marker anchored to its
+ * real coordinates.
+ *
+ * MapLibre is imported lazily inside an effect because it touches `window` at
+ * module scope, which would break server rendering of any page using the map.
  */
 export function MapBase<T extends BaseMarker = MapPin>({
   markers = MAP_PINS as unknown as T[],
   renderPin,
   className,
   center,
+  defaultZoom = 12,
 }: {
   markers?: T[];
   renderPin: (marker: T, index: number) => React.ReactNode;
   className?: string;
-  /** Accepted for API compatibility; the mockup fits all markers in view. */
   defaultZoom?: number;
   center?: { lat: number; lng: number };
 }) {
-  const bounds = React.useMemo(() => {
-    const lats = markers.map((m) => m.lat);
-    const lngs = markers.map((m) => m.lng);
-    if (center) {
-      lats.push(center.lat);
-      lngs.push(center.lng);
-    }
-    return {
-      minLat: Math.min(...lats),
-      maxLat: Math.max(...lats),
-      minLng: Math.min(...lngs),
-      maxLng: Math.max(...lngs),
-    };
-  }, [markers, center]);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const mapRef = React.useRef<MlMap | null>(null);
+  const libRef = React.useRef<typeof import('maplibre-gl') | null>(null);
+  const markerRefs = React.useRef<{ marker: MlMarker; root: Root }[]>([]);
+  const [ready, setReady] = React.useState(false);
 
-  const place = (m: T) => {
-    const { minLat, maxLat, minLng, maxLng } = bounds;
-    const left = maxLng !== minLng ? 12 + ((m.lng - minLng) / (maxLng - minLng)) * 76 : 50;
-    const top = maxLat !== minLat ? 88 - ((m.lat - minLat) / (maxLat - minLat)) * 76 : 50;
-    return { left, top };
-  };
+  const startLat = center?.lat ?? CENTER.lat;
+  const startLng = center?.lng ?? CENTER.lng;
+
+  // Create the map once, client-side only.
+  React.useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      if (!containerRef.current || mapRef.current) return;
+      const maplibregl = await import('maplibre-gl');
+      if (cancelled || !containerRef.current) return;
+      libRef.current = maplibregl;
+
+      const map = new maplibregl.Map({
+        container: containerRef.current,
+        style: STYLE_URL,
+        center: [startLng, startLat],
+        zoom: defaultZoom,
+        attributionControl: { compact: true },
+      });
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+      map.on('load', () => {
+        if (!cancelled) setReady(true);
+      });
+      mapRef.current = map;
+    })();
+
+    return () => {
+      cancelled = true;
+      markerRefs.current.forEach(({ marker, root }) => {
+        marker.remove();
+        // Unmount on a later tick — React forbids unmounting during render.
+        setTimeout(() => root.unmount(), 0);
+      });
+      markerRefs.current = [];
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+    // Intentionally one-shot: re-creating the map on every prop change would
+    // throw away the user's pan/zoom.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync markers whenever they change.
+  React.useEffect(() => {
+    const map = mapRef.current;
+    const maplibregl = libRef.current;
+    if (!map || !maplibregl || !ready) return;
+
+    markerRefs.current.forEach(({ marker, root }) => {
+      marker.remove();
+      setTimeout(() => root.unmount(), 0);
+    });
+    markerRefs.current = [];
+
+    const points = markers.filter((m) => Number.isFinite(m.lat) && Number.isFinite(m.lng));
+
+    points.forEach((m, i) => {
+      const el = document.createElement('div');
+      const root = createRoot(el);
+      root.render(renderPin(m, i));
+      const marker = new maplibregl.Marker({ element: el })
+        .setLngLat([m.lng, m.lat])
+        .addTo(map);
+      markerRefs.current.push({ marker, root });
+    });
+
+    // Frame all the pins; with a single pin just centre on it.
+    if (points.length > 1) {
+      const bounds = new maplibregl.LngLatBounds(
+        [points[0].lng, points[0].lat],
+        [points[0].lng, points[0].lat],
+      );
+      points.forEach((m) => bounds.extend([m.lng, m.lat]));
+      map.fitBounds(bounds, { padding: 72, maxZoom: 15, duration: 600 });
+    } else if (points.length === 1) {
+      map.easeTo({ center: [points[0].lng, points[0].lat], zoom: 14, duration: 600 });
+    }
+  }, [markers, renderPin, ready]);
 
   return (
     <div className={cn('relative overflow-hidden bg-secondary/40', className)}>
-      {/* Base tint */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(160deg, hsl(var(--muted)) 0%, hsl(var(--secondary)) 100%)',
-        }}
-        aria-hidden
-      />
-
-      {/* Abstract streets / blocks / green space */}
-      <svg
-        className="absolute inset-0 size-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden
-      >
-        {/* City blocks */}
-        <g fill="hsl(var(--background))" opacity="0.35">
-          <rect x="8" y="10" width="16" height="12" rx="1.5" />
-          <rect x="28" y="8" width="20" height="10" rx="1.5" />
-          <rect x="66" y="12" width="18" height="14" rx="1.5" />
-          <rect x="10" y="60" width="18" height="14" rx="1.5" />
-          <rect x="34" y="70" width="22" height="16" rx="1.5" />
-          <rect x="70" y="64" width="16" height="18" rx="1.5" />
-          <rect x="60" y="40" width="14" height="12" rx="1.5" />
-        </g>
-
-        {/* Green space */}
-        <ellipse cx="22" cy="42" rx="13" ry="9" fill="hsl(var(--accent))" opacity="0.16" />
-        <ellipse cx="82" cy="46" rx="10" ry="7" fill="hsl(var(--accent))" opacity="0.13" />
-
-        {/* River */}
-        <path
-          d="M -5 78 Q 25 66 45 74 T 105 62"
-          fill="none"
-          stroke="hsl(var(--accent))"
-          strokeOpacity="0.28"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-        />
-
-        {/* Roads */}
-        <g stroke="hsl(var(--background))" strokeLinecap="round" fill="none">
-          <path d="M -5 32 Q 40 28 70 34 T 105 30" strokeOpacity="0.6" strokeWidth="1.4" />
-          <path d="M -5 54 Q 30 58 55 52 T 105 56" strokeOpacity="0.5" strokeWidth="1.1" />
-          <path d="M 30 -5 Q 34 40 40 70 T 46 105" strokeOpacity="0.55" strokeWidth="1.2" />
-          <path d="M 74 -5 Q 70 35 76 65 T 72 105" strokeOpacity="0.45" strokeWidth="1" />
-        </g>
-      </svg>
-
-      {/* "You are here" at centre */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" aria-hidden>
-        <span className="block size-3 rounded-full bg-accent ring-4 ring-accent/25" />
-      </div>
-
-      {/* Markers */}
-      {markers.map((m, i) => {
-        const p = place(m);
-        return (
-          <div
-            key={m.id}
-            className="absolute -translate-x-1/2 -translate-y-full"
-            style={{ left: `${p.left}%`, top: `${p.top}%` }}
-          >
-            {renderPin(m, i)}
-          </div>
-        );
-      })}
+      <div ref={containerRef} className="absolute inset-0" />
     </div>
   );
 }
